@@ -1,0 +1,298 @@
+#+TITLE: Values in Python
+#+AUTHOR: Jim Fowler
+
+In this Jupyter notebook, you'll meet some of the basic data types in
+Python: numbers, strings, and lists.
+
+Before executing each cell, take a moment to guess what will happen.
+If your guess differs from what actually takes place, take the time to
+resolve the cognitive dissonance!
+
+* Numbers
+
+You can treat Jupyter notebooks as the nicest calculator you've ever owned.
+
+#+BEGIN_SRC ipython 
+4 * 4 + 1
+#+END_SRC
+
+You can assign values to variables to use them later.
+
+#+BEGIN_SRC ipython 
+x = 4
+x * x + 1
+#+END_SRC
+
+** Types
+
+In Python, a number might be an ~int~-eger.
+
+#+BEGIN_SRC ipython 
+type(17)
+#+END_SRC
+
+A number might have a ~float~-ing decimal point.
+
+#+BEGIN_SRC ipython 
+type(17.0)
+#+END_SRC
+
+What happens when a calculation involving an ~int~ and an ~int~ would
+result in something that isn't an ~int~?
+
+#+BEGIN_SRC ipython 
+17 / 5
+#+END_SRC
+
+You can check the ~type~ of a number as follows.
+
+#+BEGIN_SRC ipython 
+type(17 / 5)
+#+END_SRC
+
+** More division
+
+#+BEGIN_SRC ipython 
+type(17 / 5)
+#+END_SRC
+
+What if you instead use ~//~?
+
+#+BEGIN_SRC ipython 
+17 // 5
+#+END_SRC
+
+We refer to ~//~ as /floor division/.
+
+#+BEGIN_SRC ipython 
+17 % 5
+#+END_SRC
+
+What name would we give to ~%~?  The percent sign has a slash in it,
+so perhaps it has something to do with division.
+
+** Misconceptions
+
+A common misconception arises with the following notation.
+
+#+BEGIN_SRC ipython 
+17^5
+#+END_SRC
+
+Try ~17**5~ instead.  What operation does ~^~ denote?
+
+** Who is afraid of floating point arithmetic?
+
+Are you worried generally about floating point arithmetic?
+
+#+BEGIN_SRC ipython
+one = 0.35 + 0.30 + 0.35
+one == 1.0
+#+END_SRC
+
+How ought /one/ generally deal with situations like the above?
+
+* Strings
+
+Not all data is numeric.  Think of a "string" of characters like beads
+on a string.  You can ~print~ a string.
+
+#+BEGIN_SRC ipython
+multiline = 'Use backspace n like this\nto insert a newline'
+print(multiline)
+#+END_SRC
+
+** Length
+
+Can you guess what the function ~len~ does?
+
+#+BEGIN_SRC ipython
+big = 'gigantic'
+len(big)
+#+END_SRC
+
+** Concatenation
+
+#+BEGIN_SRC ipython
+'concat' + 'enation'
+#+END_SRC
+
+** Replace
+
+Python is "object-oriented" and like many such languages, "methods"
+are called on objects using dot notation.  Below we call ~replace~ on
+the string ~x~.
+
+#+BEGIN_SRC ipython
+x = 'the input'
+x.replace('in', 'out')
+#+END_SRC
+
+**A common misconception.** What is the output of the code below?
+Make sure to make your guess before executing the cell.
+
+#+BEGIN_SRC ipython
+x = 'the input'
+x.replace('in', 'out')
+print(x)
+#+END_SRC
+
+** Strip
+
+Much of data science involves /cleaning/ poorly formatted data.  One
+method useful for this task is ~strip~ but can you describe what it
+does?
+
+#+BEGIN_SRC ipython
+data = '   \n \n    some data  \n \n \n    \n '
+data.strip()
+#+END_SRC
+
+Check your guess on the meaning of ~strip~ by predicting what the
+following cell evaluates to.
+
+#+BEGIN_SRC ipython
+more_data = '   \n \n    some\nmore\ndata  \n \n \n    \n '
+more_data.strip()
+#+END_SRC
+
+** Format
+
+You can use the ~format~ method to produce output.
+
+#+BEGIN_SRC ipython
+'build {} strings with {}'.format('complicated', 'format')
+#+END_SRC
+
+You can also use named arguments.
+
+#+BEGIN_SRC ipython
+'A {animal} is a {animal} of course.  His name is Mister {name}.'.format(animal='horse', name='Ed')
+#+END_SRC
+
+* Lists
+
+In Python, we produce lists of values with ~[~ and ~]~.
+
+** Building lists
+
+#+BEGIN_SRC ipython
+xs = [2, 5, 17]
+len(xs)
+#+END_SRC
+
+There is also the empty list.
+
+#+BEGIN_SRC ipython
+empty = []
+len(empty)
+#+END_SRC
+
+Unlike in some languages, you can mix together various values of
+differing ~type~ in your lists.
+
+#+BEGIN_SRC ipython
+[4,'things that are', ['different'], 0.1]
+#+END_SRC
+
+Note that your lists can contain lists!
+#+BEGIN_SRC ipython
+[[9, 5, 1], [6, 5], [0, 9, 4, 5], [3, 7, 5]]
+#+END_SRC
+
+** Accessing entries
+
+In the list ~xs~, reference the ~index~ entry with ~xs[index]~.  Try
+the code below.  Do you expect to see a 4 or an 8?
+
+#+BEGIN_SRC ipython
+xs = [1, 2, 4, 8, 16, 32, 64]
+xs[3]
+#+END_SRC
+
+Can you guess what the output of the cell below?
+#+BEGIN_SRC ipython
+xs = [[9, 5, 1], [6, 5], [0, 9, 4, 5], [3, 7, 5]]
+xs[2][3]
+#+END_SRC
+
+** Modifying entries
+
+You can modify lists by placing ~xs[index]~ on the left-hand side of an assignment.
+
+#+BEGIN_SRC ipython
+xs = [5, 8, 2, 4]
+xs[1] = 3
+print(xs)
+#+END_SRC
+
+Sometimes students misunderstand the effect of the code below.  Can
+you guess what will be printed?  If you are right, can you explain
+why?
+
+#+BEGIN_SRC ipython
+xs = [5, 8, 2, 4]
+ys = xs
+xs[1] = 3
+print(ys)
+#+END_SRC
+
+** Methods
+
+Add new values to the end of a list with ~append~.
+
+#+BEGIN_SRC ipython
+xs = [0, 2, 4, 6]
+xs.append(8)
+print(xs)
+#+END_SRC
+
+Can you remove entries with ~remove~.
+
+#+BEGIN_SRC ipython
+xs = [0, 2, 4, 6]
+xs.remove(4)
+print(xs)
+#+END_SRC
+
+** Sorting lists
+
+#+BEGIN_SRC ipython
+sorted([4, 3, 3, 7, 2, 7, 7, 2, 10, 6])
+#+END_SRC
+
+There is also a ~sort~ method.
+
+#+BEGIN_SRC ipython
+x = [4, 3, 3, 7, 2, 7, 7, 2, 10, 6]
+x.sort()
+x
+#+END_SRC
+
+There is a mistake in the code below.  Can you fix it?
+
+#+BEGIN_SRC ipython
+x = [4, 3, 3, 7, 2, 7, 7, 2, 10, 6]
+print(x.sort())
+#+END_SRC
+
+* Lists and strings
+
+The expressive power of any language, including programming languages,
+arises because the various pieces of the language are /composable/ and
+related to each other in complicated way.  How do lists and strings
+relate?
+
+** From lists to strings
+
+#+BEGIN_SRC ipython
+animals = ['cat', 'dog', 'cow', 'python']
+', '.join(animals)
+#+END_SRC
+
+** From strings to lists
+
+#+BEGIN_SRC ipython
+sentence = 'This is a string of words but I want a list.'
+sentence.split()
+#+END_SRC

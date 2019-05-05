@@ -1,0 +1,116 @@
+#+TITLE: Dictionaries
+#+AUTHOR: Jim Fowler
+
+We've already met numbers, strings, and lists, but Python provides
+other basic data types such as the /dictionary/ which, in other
+languages, might be named an associative array.  Python dictionaries
+associate /values/ (either mutable or immutable) to keys (which must
+be immutable).
+
+* Creating dictionaries
+
+#+BEGIN_SRC ipython 
+{'cat': 17, 'dog': -15, 'turtle': 0}
+#+END_SRC
+
+There is the empty list ~[]~ and likewise the empty dictionary ~{}~.
+
+#+BEGIN_SRC ipython 
+empty = {}
+#+END_SRC
+
+* Operations on dictionaries
+
+You can look-up values associated to a given key.
+
+#+BEGIN_SRC ipython 
+d = {'cat': 17, 'dog': -15, 'turtle': 0}
+d['turtle']
+#+END_SRC
+
+What happens if you try to access a missing key?
+
+#+BEGIN_SRC ipython 
+d = {'cat': 17, 'dog': -15, 'turtle': 0}
+print(d['purple'])
+#+END_SRC
+
+Contrast that with the result of using ~get~.
+
+#+BEGIN_SRC ipython 
+d = {'cat': 17, 'dog': -15, 'turtle': 0}
+print(d.get('purple'))
+#+END_SRC
+
+In what cases would you prefer ~get~?
+
+Dictionaries are mutable.
+
+#+BEGIN_SRC ipython 
+d = {'cat': 17, 'dog': -15, 'turtle': 0, 'fish': 100}
+print(d['cat'])
+d['cat'] = 1000
+print(d)
+#+END_SRC
+
+You can remove items.
+
+#+BEGIN_SRC ipython 
+del d['fish']
+d
+#+END_SRC
+
+Can you describe when two dictionaries are equal?
+
+#+BEGIN_SRC ipython 
+e = {}
+e['cat'] = 1000
+e['dog'] = -15
+e['turtle'] = 0
+e == d
+#+END_SRC
+
+* Some methods
+
+What happens when you call the ~keys~ method on a dictionary?  Why do I wrap this in ~list~?
+
+#+BEGIN_SRC ipython 
+list(d.keys())
+#+END_SRC
+
+#+BEGIN_SRC ipython 
+list(d.values())
+#+END_SRC
+
+#+BEGIN_SRC ipython 
+list(d.items())
+#+END_SRC
+
+We met ~get~ earlier, but there is more to ~get~.  For instance, there
+is a facility for including default values instead of ~None~.
+
+#+BEGIN_SRC ipython 
+d = {'cat': 17, 'dog': -15, 'turtle': 0}
+print(d.get('cat',-1))
+print(d.get('purple',-1))
+#+END_SRC
+
+There is also ~pop~.
+
+#+BEGIN_SRC ipython 
+d = {'cat': 17, 'dog': -15, 'turtle': 0}
+print(d)
+print(d.pop('cat'))
+print(d)
+#+END_SRC
+
+Finally, you can merge two dictionaries with ~update~.
+
+#+BEGIN_SRC ipython 
+d1 = {'cat': 17, 'dog': -15, 'turtle': 0}
+d2 = {'cow': 1, 'sheep': 16}
+print(d1,d2)
+d1.update(d2)
+print(d1,d2)
+#+END_SRC
+

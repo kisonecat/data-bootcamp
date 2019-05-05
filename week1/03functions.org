@@ -1,0 +1,76 @@
+#+TITLE: Functions
+#+AUTHOR: Jim Fowler
+
+"Programming" involves breaking down complicated problems into
+simplier pieces.  "Functions" are one way of managing that complexity
+by introducing some abstraction.
+
+* Building your own functions
+
+Use ~def~ to define a function, and call the function by appending ~()~ to its name.
+
+#+BEGIN_SRC ipython 
+def greet():
+    print('Hello, world!')
+
+greet()
+#+END_SRC
+
+* Arguments
+
+Your functions can take arguments.
+
+#+BEGIN_SRC ipython 
+def add_them(a, b):
+    print(a,'plus',b,'is',a+b)
+
+add_them(5,12)
+#+END_SRC
+
+* Documentation
+
+The audience for the code you write is not only the machine, but
+ultimately other people and your future self.  Some amount of
+documentation is valuable in this regard, and "docstrings" can be nice
+to make some "help" available for the new functions you define.
+
+#+BEGIN_SRC ipython 
+def distance(a, b):
+    """Determine the distance |a-b| between points a and b on the real line"""
+    return abs(a-b)
+
+print(help(distance))
+#+END_SRC
+
+* Return values
+
+If we were thinking mathematically, a "function" ought to mean a
+relationship between input and output.  We use ~return~ for this.
+
+#+BEGIN_SRC ipython 
+def f(x):
+    x = x + 1
+    return x*x
+
+f(5)
+#+END_SRC
+
+* Lambda
+
+Not all students will want to think about ~lambda~, but for students
+with some experience with programming, thinking about ~lambda~ can a
+helpful next step.
+
+#+BEGIN_SRC ipython 
+f = lambda x: x*x
+f(5)
+#+END_SRC
+#+END_SRC
+
+* list comprehension
+
+Python provides some syntactic sugar for building lists.
+
+#+BEGIN_SRC ipython 
+[x**2 for x in range(10)]
+#+END_SRC

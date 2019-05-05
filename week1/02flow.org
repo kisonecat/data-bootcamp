@@ -1,0 +1,139 @@
+#+TITLE: Flow control
+#+AUTHOR: Jim Fowler
+
+In this lesson, we meet some /flow control/, meaning conditionals
+("if-then") and loops ("for" and "while").  Perhaps the biggest
+challenge for newcomers to Python is /semantic whitespace/ meaning
+that the indentation in Python is meaningful.
+
+* Booleans
+
+#+BEGIN_SRC ipython 
+type(True)
+#+END_SRC
+
+** Numeric comparison
+
+The "not equal" ~!=~ looks a bit like a slash through an equal sign.
+
+#+BEGIN_SRC ipython 
+1 != 0
+#+END_SRC
+
+For greater-than-or-equal-to, the "equal" comes after the
+"greater-than" sign.
+
+#+BEGIN_SRC ipython 
+1 >= 0
+#+END_SRC
+
+You can include multiple inequalities.
+
+#+BEGIN_SRC ipython 
+1 <= 2 <= 3
+#+END_SRC
+
+** Lists
+
+You can check if a value appears in a list.
+
+#+BEGIN_SRC ipython 
+4 in [0,2,4,6,8]
+#+END_SRC
+
+** Boolean algebra
+
+Instead of puncuation as in other languages, in Python write ~and~ and ~or~ and ~not~ for the operations on booleans.
+
+#+BEGIN_SRC ipython 
+True and False
+#+END_SRC
+
+#+BEGIN_SRC ipython 
+True or False
+#+END_SRC
+
+#+BEGIN_SRC ipython 
+not False
+#+END_SRC
+
+* Conditionals
+
+We now use conditionals in "if-then" statements.  Note that there is a
+colon ~:~ at the end of the "if" and the code underneath is indented.
+
+#+BEGIN_SRC ipython 
+if 1 > 0:
+    print('one is bigger')
+#+END_SRC
+
+To get a feeling for the meaning of indentation, compare the output of the following two cells.
+
+#+BEGIN_SRC ipython 
+if 1 > 0:
+    print('one is bigger')
+print('more printing')
+#+END_SRC
+
+#+BEGIN_SRC ipython 
+if 1 > 0:
+    print('one is bigger')
+    print('more printing')
+#+END_SRC
+
+* Loops
+
+You can do something for each entry in a list by using a ~for~ loop.
+
+#+BEGIN_SRC ipython 
+for i in [1,2,3,4,5]:
+    print(2*i)
+#+END_SRC
+
+Instead of building lists by naming each of the entries, try ~range~.
+
+#+BEGIN_SRC ipython 
+for i in range(5):
+    print(2*i)
+#+END_SRC
+
+Do you have a sense of the result of ~range(5)~?  Is it the numbers 1
+through 5?  0 through 4?  Try ~range(1,5)~ and ~range(1,6)~.  What if
+you use three parameters to ~range~ as follows?
+
+#+BEGIN_SRC ipython 
+for i in range(5,20,2):
+    print(i)
+#+END_SRC
+
+** While
+
+A ~while~ loop repeats "while" the condition holds.
+
+#+BEGIN_SRC ipython 
+xs = [1,2,3,4]
+while len(xs) > 0:
+    xs.remove( xs[0] )
+    print(xs)
+#+END_SRC
+
+** Break and continue
+
+With ~break~ you can escape from a loop earlier than you normally would.
+
+#+BEGIN_SRC ipython 
+for i in range(100):
+    if i == 5:
+        break
+    print(i)
+#+END_SRC
+
+With ~continue~ you can restart a loop early.
+
+#+BEGIN_SRC ipython 
+for i in range(10):
+    print("first",i)
+    if i > 3:
+        continue
+    print("and",i)
+#+END_SRC
