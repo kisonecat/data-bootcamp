@@ -1,0 +1,50 @@
+#+TITLE: File I/O
+#+AUTHOR: Jim Fowler
+
+* Working with paths
+
+Note the mysterious ~import os~ which "imports" some additional
+functions for us.  In the future, we will ~import~ other Python
+packages.
+
+#+BEGIN_SRC ipython 
+import os
+notebook = os.path.realpath('05files.ipynb')
+print('current file: {}'.format(notebook))
+notebook_path = os.path.dirname(notebook)  
+print('current directory: {}'.format(notebook_path))
+#+END_SRC
+
+**Warning:** Outside of Jupyter notebooks, we would get the path of
+current file via ~__file__~.
+
+* Reading files
+
+In ~d6.txt~, I have placed 250 throws of a six-sided die.  Let's print them.
+
+#+BEGIN_SRC ipython 
+file_path = os.path.join(notebook_path, 'd6.txt')
+
+with open(file_path, 'r') as f:
+    for line in f:
+        print(line.strip())
+#+END_SRC
+
+Note the use of ~with~ which guarantees that ~f.close()~ is called
+after the end of the ~with~ stanza.
+
+Can you perform some simple statistics on the data in ~d6.txt~?  How
+many times was a 1 thrown?
+
+* Writing files
+
+Try creating a new file called ~hello.txt~ and writing a string to it.
+
+#+BEGIN_SRC ipython 
+hello_path = os.path.join(notebook_path, 'hello.txt')
+
+with open(hello_path, 'w') as f:
+    f.write('Hello, world!')
+#+END_SRC
+
+After you run this code, check that the file now exists.

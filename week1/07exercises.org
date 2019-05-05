@@ -1,0 +1,79 @@
+#+TITLE: Exercises for Python
+#+AUTHOR: Jim Fowler
+
+Executing cells is not the same as learning.  Now is the time for you
+to truly learn by writing some code on your own.  You can add your own
+cells to this worksheet, save your work, and then commit your
+solutions to a fork of our class repo.
+
+**Warning:** Depending on your background, you may feel you are
+unprepared for this task.  *Make as much progress as you can.* The
+good news is that with Google, StackOverflow, etc., you are more
+powerful than you know.  Leverage the resources at your disposal to
+make the most of our short time together.
+
+* Exercise 1.1
+
+For a list ~L~, what is the meaning of ~L[-1]~, ~L[-2]~, ~L[1:3]~,
+~L[:]~, ~L[-3:-1]~, ~L[-2:]~, ~L[::-1]~?  Explore this by building
+some lists and executing cells right here in this Jupyter notebook.
+(If you get stuck, search for *slicing*.)
+
+* Exercise 1.2
+
+Define a function ~digits()~ which takes a positive integer and
+returns the number of digits in its decimal expansion.  For instance,
+~digits(321)~ evaluates to ~3~.
+
+How many digits are in the decimal expansion of ~2**1000~?
+
+* Exercise 1.3
+
+Define ~harmonic~ so that ~harmonic(n)~ is the sum of the first ~n~
+terms of the harmonic series, i.e., ~harmonic(4)~ equals $1 + \frac{1}{2} + \frac{1}{3} + \frac{1}{4}$.
+
+* Exercise 1.4
+
+Define a function ~uniqued~ which takes a list and removes all
+repeated entries.  For instance, ~uniqued([1,5,1,4])~ equals ~[1,5,4]~.
+
+* Exercise 1.5
+
+Explain what is happening in the code below (e.g., what does this say about *associativity* of ~+~?)
+
+#+BEGIN_SRC ipython
+eps = 1.0
+while 1.0 + eps != 1.0:
+    eps = eps / 2.0
+print(1.0 + (eps - eps))
+print((1.0 + eps) - eps)
+#+END_SRC
+
+If you like this, you might enjoy reading *[What Every Computer Scientist Should Know About Floating-Point Arithmetic](https://docs.oracle.com/cd/E19957-01/806-3568/ncg_goldberg.html)*.
+
+* Exercise 1.6
+
+Write a function ~is_palindrome~ which takes a string and returns
+~True~ if it is a palindrome, and ~False~ if not.  Find an English
+word list (such as https://github.com/dwyl/english-words which
+includes some Python examples) to find English palindromes.
+
+There are many entertaining games to play with word lists.  Find more
+examples of words like *almost* and *wronged* whose letters are in
+alphabetical or reverse-alphabetic order.  Is the spelling "rule" *i
+before e except after c* valid?  Can you make a histogram showing
+frequency of letters in English words?  How might you visualize
+frequency of pairs of letters?
+
+* Exercise 1.7
+
+Define a function ~flip~ which takes an integer and reverses its
+digits, so that ~flip(17)~ evaluates to ~71~.  By repeatedly replacing
+~x~ with ~x + flip(x)~, we often find palindromic numbers this way,
+e.g., 192 + 291 is 483, and 483 + 384 is 867, and and 867 + 768 is
+1635, and 1635 + 5361 is 6996, a palindrome!  Experimentally, does
+this always happen?  For fun, use ~matplotlib~ to make some graphs.
+
+This exercise is designed for you to worry about types, e.g., ~'17' +
+'71'~ equals ~'1771'~ because strings are concatenated with plus.
+

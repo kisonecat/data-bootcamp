@@ -1,0 +1,36 @@
+* Using Jupyter Notebooks
+
+To evaluate a cell, highlight the cell and press Shift+Enter.
+
+To create a new cell, hit the + button in the toolbar above.
+
+To create a cell for writing (as opposed to code) such as this one,
+highlight the cell and switch its type to Markdown in the dropdown
+menu above.
+
+** Some useful shortcuts
+
+In a cell, type esc, m, enter to go into change a cell to Markdown.
+
+Click to the left of a cell to enter Command Mode. In Command Mode, type:
+
+- *a* to add cell above
+- *b* to add cell below
+- *d*to delete the cell
+
+Other useful shortcuts can be found [here](http://maxmelnick.com/2016/04/19/python-beginner-tips-and-tricks.html).
+
+* Try it!
+
+Try executing this cell.
+
+#+BEGIN_SRC ipython 
+print('Hello, world.')
+#+END_SRC
+
+Note that text after ~#~ is treated as a *comment*.
+
+#+BEGIN_SRC ipython 
+# Share our standard greeting
+print('Hello, world.')
+#+END_SRC
