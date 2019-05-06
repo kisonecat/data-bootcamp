@@ -1,0 +1,178 @@
+#+TITLE: Meet pandas
+#+AUTHOR: Jim Fowler
+
+The term "regression" originated with the work of Galton on the
+heights of parents and their children.  How do you suppose a child's
+adult height is related to their parents' heights?  Let's explore the
+data.
+
+We'll use ~pandas~, which stands for "Python Data Analysis Library" or
+perhaps "panel data," an econometrics term for multidimensional
+structured data sets.  In any case, ~pandas~ is an open source,
+BSD-licensed library providing high-performance, easy-to-use data
+structures and data analysis tools for Python.  It's popular, and its
+basic conceit of *data frames* is widely used (e.g., in R).  Let's
+begin by loading the ~pandas~ module.
+
+#+BEGIN_SRC ipython 
+import pandas as pd 
+import numpy as np
+import matplotlib.pyplot as plt
+#+END_SRC
+
+* Loading Galton's data
+
+We read Galton's data into a data frame ~df~.
+
+#+BEGIN_SRC ipython 
+df = pd.read_csv('galton.csv')
+#+END_SRC
+
+This data includes the parents' heights and the child's eventual adult
+height.  Here's some of the data.
+
+#+caption: Some of Galton's data
+| mother | father | height |
+|--------+--------+--------|
+|   67.0 |   78.5 |   69.2 |
+|   67.0 |   78.5 |   69.0 |
+|   67.0 |   78.5 |   69.0 |
+|   66.5 |   75.5 |   73.5 |
+|   66.5 |   75.5 |   72.5 |
+|   66.5 |   75.5 |   65.5 |
+|   66.5 |   75.5 |   65.5 |
+
+You can see the "whole" data frame by evaluating ~df~.
+
+#+BEGIN_SRC ipython 
+df
+#+END_SRC
+
+You can get a quick overview with ~describe~.
+
+#+BEGIN_SRC ipython 
+df.describe()
+#+END_SRC
+
+* Some basic questions
+
+Are the fathers generally taller than the mothers?
+
+#+BEGIN_SRC ipython 
+df.father.mean() > df.mother.mean()
+#+END_SRC
+
+Is it enough to compare the means like this?  We could also explore
+this question by looking at histograms.
+
+#+BEGIN_SRC ipython 
+df.father.hist()
+df.mother.hist()
+plt.show()
+#+END_SRC
+
+* Subsetting
+
+A reason to love ~pandas~ is that it simplifies certain "data
+wrangling" tasks.  A common task is taking a subset.
+
+The gender of the child is given by the ~gender~ column.
+
+#+BEGIN_SRC ipython 
+df.gender
+#+END_SRC
+
+Let's see if daughters are taller than their mothers.  We'll filter
+using the following.
+
+#+BEGIN_SRC ipython 
+daughters = df[df.gender == 'F']
+#+END_SRC
+
+What sort of object is ~df.gender == 'F'~ ?  You should be feeling
+that ~pandas~ is quite expressive!
+
+#+BEGIN_SRC ipython 
+daughters.describe()
+#+END_SRC
+
+The average height of the daughters is less than (but so close!) to
+that of their mothers.  But is it enough to just look at the mean?
+
+* Scatter plots
+
+One feature of ~pandas~ is how accessible it makes the usual
+"exploratory" tools like scatterplots.  Indeed, when you are working
+with data, **first look at your data** and some scatterplots are a
+reasonable way to do this.
+
+We could plot the father's height on the $x$-axis and the child's eventual height on the $y$-axis.
+
+#+BEGIN_SRC ipython 
+df.plot.scatter('father', 'height')
+plt.show()
+#+END_SRC
+
+Or the mother's height on the $x$-axis and the child's eventual height on the $y$-axis.
+
+#+BEGIN_SRC ipython 
+df.plot.scatter('mother', 'height')
+plt.show()
+#+END_SRC
+
+But ~pandas~ also permits various calculations to be performed on the
+rows.  Let's add a column to our data frame which is the average the
+heights of the two parents.
+
+#+BEGIN_SRC ipython 
+df['midparent'] = (df.father + df.mother)/2
+#+END_SRC
+
+Now we could plot the midparent height on the $x$-axis instead.
+
+#+BEGIN_SRC ipython 
+df.plot.scatter('midparent', 'height')
+plt.show()
+#+END_SRC
+
+I encourage you to look at the other methods available under ~df.plot~
+to explore this dataset further.  This data is available at [a data
+repository](https://doi.org/10.7910/DVN/T0HSJ1) and if you are looking
+for other interesting data sets, I also encourage you to explore these
+data repositories.
+
+* Making predictions
+
+Can we use Galton's data to predict the height of a child based on the
+average height of his/her parents?
+
+There are various ways to do this.  Perhaps the first thing to think
+to do is the following: to predict the height of a child whose
+midparent height is $x$, let's look at "neighbors" meaning rows
+in the data frame where the midparent height is close to $x$.
+
+#+BEGIN_SRC ipython 
+def neighbors(x):
+    return df[ abs(df['midparent'] - x) < 2 ]
+#+END_SRC
+
+Once we have some "neighbors," we can look at their average height.
+
+#+BEGIN_SRC ipython 
+def prediction(x):
+    return neighbors(x).height.mean()
+#+END_SRC
+
+Now let's plot our predictions.  Because ~pandas~ is built on
+~matplotlib~ it is easy to combine plots from different sources.
+
+#+BEGIN_SRC ipython 
+df.plot.scatter('midparent', 'height')
+xs = np.linspace( df.midparent.min(), df.midparent.max(), 100 )
+plt.plot(xs, [prediction(x) for x in xs])
+plt.show()
+#+END_SRC
+
+That "prediction line" is wiggly, but certainly looks like a line!
+What line is it?  "Linear regression" is our next goal.
+

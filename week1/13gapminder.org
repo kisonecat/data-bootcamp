@@ -1,0 +1,43 @@
+#+TITLE: Gapminder
+#+AUTHOR: Jim Fowler
+
+The Gapminder Foundation is a non-profit promoting sustainable global
+development by increased use and understanding of statistics about
+social, economic and environmental development.  They make data
+available.
+
+* Load some data
+
+You may have thought that the argument to ~read_csv~ needed to be a
+file, but it can also be a URL.  Let's load some gapminder data from a
+GitHub repository.
+
+#+BEGIN_SRC ipython 	
+import pandas as pd 
+import numpy as np
+import matplotlib.pyplot as plt
+url = 'https://raw.githubusercontent.com/resbaz/r-novice-gapminder-files/master/data/gapminder-FiveYearData.csv'
+df = pd.read_csv(url)
+#+END_SRC
+
+* Some initial plots
+
+We could explore GDP per capita versus life expectancy.
+
+#+BEGIN_SRC ipython
+df.plot.scatter( 'gdpPercap', 'lifeExp' )
+plt.show()
+#+END_SRC
+
+It might be a bit easier to see a football-shaped scatterplot if we
+use a logarithmic scale on the $x$-axis.
+
+#+BEGIN_SRC ipython
+df.plot.scatter( 'gdpPercap', 'lifeExp' )
+plt.xscale('log')
+plt.show()
+#+END_SRC
+
+Your **homework** for today is to continue exploring this data set.
+What questions can you invent?  Use the ~pandas~ documentation and all
+the resources at your disposal to dig into the data.

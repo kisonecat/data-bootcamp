@@ -1,5 +1,5 @@
 #+TITLE: Random walks
-#+AUTHOR: Jim Fowler
+#+AUTHOR: Tom Needham and Jim Fowler
 
 * Random walks
 

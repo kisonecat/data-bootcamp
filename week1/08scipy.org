@@ -1,5 +1,5 @@
 #+TITLE: Meet scipy 
-#+AUTHOR: Jim Fowler
+#+AUTHOR: Tom Needham and Jim Fowler
 
 Today we meet ~scipy~, a package for scientific computing with Python.
 

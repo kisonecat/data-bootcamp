@@ -1,5 +1,5 @@
 #+TITLE: Exercises for Python
-#+AUTHOR: Jim Fowler
+#+AUTHOR: Tom Needham and Jim Fowler
 
 Executing cells is not the same as learning.  Now is the time for you
 to truly learn by writing some code on your own.  You can add your own

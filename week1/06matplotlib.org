@@ -4,9 +4,6 @@
 In what follows, we'll want to rely on some common packages.  Execute
 the following cell.
 
-
-
-
 #+BEGIN_SRC ipython 
 %matplotlib inline
 import matplotlib.pyplot as plt
@@ -46,11 +43,12 @@ plt.plot([1, 2, 3, 4], [1, 2, 4, 9])
 plt.show()
 #+END_SRC
 
-Try plotting sine by fixing the following.
+Try plotting sine by executing the following.
 
 #+BEGIN_SRC ipython 
 plt.plot([1, 2, 3, 4, 5, 6], [math.sin(1), math.sin(2), math.sin(3), math.sin(4), math.sin(5), math.sin(6)])
 plt.show()
 #+END_SRC
 
-Clearly six points is not enough.  Make a nicer plot of $y = \sin x$.
+Clearly six points is not enough.  Your task is to make a nicer plot
+of $y = \sin x$.

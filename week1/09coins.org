@@ -1,5 +1,5 @@
 #+TITLE: Simulating a coin toss
-#+AUTHOR: Jim Fowler
+#+AUTHOR: Tom Needham and Jim Fowler
 
 * Import random
 
