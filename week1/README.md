@@ -17,8 +17,8 @@ environment.  To practice, try opening the following notebook.
 - [00jupyter](00jupyter.ipynb)
 
 This course relies on Python.  I assume that you don't know Python,
-but I know that you can learn very quickly, so you'll meet Python --
-perhaps for the first time -- through a few notebooks:
+but I know that you can learn very quickly, so you'll meet Python
+(perhaps for the first time!) through a few notebooks.
 
 - [01values](01values.ipynb)
 - [02flow](02flow.ipynb)
@@ -64,7 +64,7 @@ some graphs of random walks.
 
 With our simulations and visualizations, we met the *mean* and
 *standard deviation*.  Instead of simulations, today we look at some
-real data.  Let's learn to "wrangle" some data with ~pandas~ first.
+real data.  Let's learn to "wrangle" some data with `pandas` first.
 
 - [11pandas](11pandas.ipynb)
 
