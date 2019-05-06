@@ -1,0 +1,25 @@
+#+TITLE: Random walks
+#+AUTHOR: Jim Fowler
+
+* Random walks
+
+For your homework today, you will explore *random walks* on your own.
+
+** Build a biased coin
+
+Create a new function ~biased_coin(p)~ which takes a probability $p
+\in (0,1)$ that the coin flip is heads.
+
+Build a ~biased_coin_experiment~ function akin to the previous
+~coin_experiment~ and perform similar statistical calculations.
+
+** Plot some random walks
+
+Use the ~biased_coin~ function to define a 1-dimensional random
+walk. That is, at each time step, the walker decides by the biased
+coin flip whether to walk 'up' or 'down' along the $y$-axis.
+
+Plot several random walks over long spans of time (say 1000 steps) for
+various values of $p$.
+
+What qualitative behavior do you observe?

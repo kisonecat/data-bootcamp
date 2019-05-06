@@ -1,0 +1,248 @@
+#+TITLE: Simulating a coin toss
+#+AUTHOR: Jim Fowler
+
+* Import random
+
+Today we generate some data to analyze by creating simulations. First
+we will define a function which gives the result of a fair coin
+toss. This uses the package ~random~ which you can read about in [the
+Documentation for the Python Standard
+Library](https://docs.python.org/3/library/random.html).
+
+#+BEGIN_SRC ipython
+# Import the package 'random' with an abbreviation.
+import random as r 
+#+END_SRC
+
+The ~random~ module contains a function (not very creatively) called
+~random~ which we can run as follows:
+
+#+BEGIN_SRC ipython
+r.random()
+#+END_SRC
+
+The function generates a "random" real number.
+
+#+BEGIN_SRC ipython
+# recall that range(20) = [0,1,...,19]
+for j in range(20): 
+    print(r.random())
+#+END_SRC
+
+* A simulation of a single coin toss
+
+Now let's use ~random~ to define a new 'coin toss' function."
+
+#+BEGIN_SRC ipython
+def coin():
+    u = r.random()
+    if u < 0.5:
+        return 'H'
+    else:
+        return 'T'
+#+END_SRC
+
+* A simulation of a multiple coin tosses
+
+Let's toss the coin 10 times and look at the result.
+
+#+BEGIN_SRC ipython
+for i in range(0, 10):
+    print(coin(), end =' ') 
+#+END_SRC
+
+The named argument ~end=~ prevents ~print~ from printing a newline;
+instead, we print ~' '~ after each coin toss.
+
+Since we wish to experiment with randomness, it would be good to have
+a function which runs the coin toss experiment several times. The
+input of our function will be a positive integer and the output will
+be a string of H's and T's."
+
+#+BEGIN_SRC ipython
+def run_coin(n):
+    # Initialize the output of the function as an empty string
+    result = '' 
+    # Loop over the range of n and add the coin toss result to the output each iteration
+    for k in range(n):
+        result = result + coin() 
+    return result
+#+END_SRC
+
+* Count the number of heads
+
+**Exercise:** Write a function ~count_heads~ whose input is a result
+of the ~run_coin~ function and whose output is the number of H's in
+the string.  For instance, ~count_heads('HHTHT')~ equals 3.
+
+#+BEGIN_SRC ipython
+def count_heads(tosses):
+    raise Exception('You must implement count_heads.')
+#+END_SRC
+
+* Is the coin fair?
+
+Suppose that we would like to determine whether the coin we are
+tossing is fair. We could toss it, say, 20 times then count the number
+of heads. Of course, we don't expect to get 10 heads every time we do
+this, but if we ran this experiment several times then we should
+expect the average over all experiments to converge to 10.
+
+Let's try it.
+
+#+BEGIN_SRC ipython
+for j in range(10):
+    print(count_heads(run_coin(20)),end = ' ')
+#+END_SRC
+
+Looks reasonable, but it's hard to eyeball whether this is actually a
+good result. Let's write some functions to automate our experiment and
+to analyze it quantitatively.
+
+First we write a function to carry out the experiment.  We want to
+toss the coin ~num_tosses~ times and repeat this ~num_repeats~ times.
+
+We will store our results in a list.
+
+#+BEGIN_SRC ipython
+def coin_experiment(num_tosses,num_repeats):
+    results = []
+    for j in range(num_repeats):
+        results.append(count_heads(run_coin(num_tosses)))
+    return results
+
+coin_experiment(20,10)
+#+END_SRC
+
+** Finding the mean
+
+Now let's define a function to take the mean of a list.
+
+Certainly such a function already exists in some package, but can you
+define it yourself?
+
+#+BEGIN_SRC ipython
+def mean(L):
+    raise Exception('You must implement mean.')
+
+print(mean([1,2,3,10]),'== 4.0')
+print(mean([5,10,20,8,13,16]),'== 12')
+#+END_SRC
+
+(Incidentally, you may enjoy playing a bit of *code golf* with your
+neighbors -- can you make your implementation of ~mean~ shorter than
+your neighbor's implementation?)
+
+Once you have written ~mean~, compute the mean of an experiment.
+
+#+BEGIN_SRC ipython
+mean(coin_experiment(20,10))
+#+END_SRC
+
+How do you expect the mean of the experiment to behave if we fix the
+number of tosses and increase the number of repeats? Vice-versa?  Play
+around with parameters to get an idea for it.
+
+* Visualization
+
+An important part of exploratory data analysis is visualization.
+Let's look at a plot of this data, using a friend we've already met,
+namely ~matplotlib~.
+
+#+BEGIN_SRC ipython
+import matplotlib.pyplot as plt 
+
+# Fix the number of tosses at k.
+k = 10
+
+# Look at what happens if we run the experiment 1 through M times.
+M = 100
+
+# We will fill the list L with results of the coin experiment for k flips and t trials
+L = []
+for t in range(1,M+1):
+    L.append(mean(coin_experiment(k,t)))
+
+# Now we plot
+plt.plot(list(range(1,M+1)),L); # Semicolon supresses some unnecessary output
+
+# Add axis labels:
+plt.ylabel('Mean')
+plt.xlabel('Number of trials')
+
+plt.show()
+#+END_SRC
+
+Change the code to see what happens when the number of trials is fixed
+(say at 10), but the number of flips per trial runs between (say) 1
+and 100.  The plot should look quite different than what we got in the
+last plot. How could your output be normalized to get comparable
+graphs?
+
+* Standard deviation
+
+Let's write a function to compute the standard deviation of a
+dataset. Again this can be found in many packages, but write it
+for yourself for practice.
+
+Recall that the standard deviation $\sigma = \sigma(X)$ of a dataset
+$X = \{x_i\}_{i=1}^N$ is given by $ \sigma = \left(\frac{1}{N}
+\sum_{i=1}^N \left(x_i - \mu \right)^2 \right)^{1/2}, $ where $\mu =
+\mu(X)$ is the mean of $X$.
+
+We will write our function by defining intermediate functions, then
+combining them to get $\sigma$. This *modular* style of programming is
+good practice.  After all, the intermediate functions might be
+interesting or useful in their own right.
+
+First define a function ~delta~ which centers the data on a fixed
+value.  This takes each data point and subtracts a chosen center.
+
+#+BEGIN_SRC ipython
+def delta(data, center):
+    return [x - center for x in data]
+
+print(delta([1,2,3],5), '== [-4, -3, -2]')
+#+END_SRC
+
+Combine ~delta~ and ~mean~ to compute deviations from the mean.
+
+#+BEGIN_SRC ipython
+def deviation(data):
+    raise Exception('You must implement derivation.')
+
+print(deviation([1,4,10]), '== [-4, -1, 5]')
+#+END_SRC
+
+To compute the variance, we square the deviations, add, and divide by
+the number of data points.
+
+#+BEGIN_SRC ipython
+def variance(data):
+    return mean([x*x for x in deviation(data)])
+#+END_SRC
+
+Finally, the standard deviation is the square root of the variance.
+
+#+BEGIN_SRC ipython
+import math
+
+def stdev(data):
+    return math.sqrt(variance(data))
+#+END_SRC
+
+* Summary statistics for the coin tosses
+
+Let's look at summary statistics for our coin toss simulation.
+
+#+BEGIN_SRC ipython
+data = coin_experiment(100, 10)
+print('mean', mean(data))
+print('variance', variance(data))
+print('stdev', stdev(data))
+print('relstdev',stdev(data)/mean(data)) # 'Relative standard deviation'"
+#+END_SRC
+
+Play with the "number of tosses" and "number of trials" parameters to
+determine the qualitative behavior of the relative standard deviation
+across parameters. Create a plot to illustrate your findings.

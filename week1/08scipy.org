@@ -1,0 +1,182 @@
+#+TITLE: Meet scipy 
+#+AUTHOR: Jim Fowler
+
+Today we meet ~scipy~, a package for scientific computing with Python.
+
+We introduce ~scipy~ through the lens of "first-class functions" which
+is an idea that you've already met in mathematics: there are functions
+$f : \mathbb{R} \to \mathbb{R}$ which transform numbers to numbers,
+but also *operators* which transform functions to functions.  In
+short, the domain of a mathematical function can include functions!
+The same is true of functions in Python, which can "eat" other Python
+functions.
+
+* Lambda
+
+Not all students will want to think about ~lambda~ at first, but for
+students with some experience with programming yet who have not
+encountered ~lambda~, the experience may be transformative.
+
+#+BEGIN_SRC ipython 
+f = lambda x: x*x
+f(5)
+#+END_SRC
+
+We use this ~lambda~ notation to define functions *anonymously*,
+meaning that we need not give them a name.  For instance, we can even
+write the following.
+
+#+BEGIN_SRC ipython 
+(lambda x: x*x)(5)
+#+END_SRC
+
+The code inside the first set of parenthesis defines the anonymous
+function $x \mapsto x^2$. We then evaluate it at $x=5$ with the second
+parentheses.
+
+* First-class functions and calculus
+
+To see an example of how these lambda functions might be useful, let's
+define a function which takes a function as one of its inputs. The
+~integral~ function has inputs: a function $f$, a lower bound $a$, an
+upper bound $b$ and a positive real number $h$. The output is the
+numerical approximation integral of $f$ over $[a,b]$ using
+subdivisions of size $h$. in particular, we are using rectangular
+approximations to compute the integral.
+
+#+BEGIN_SRC ipython 
+def integral(f, a, b, h):
+    sum = 0
+    x = a
+    while x < b:
+        sum = sum + f(x)*h
+        x = x + h
+    return sum
+#+END_SRC
+
+Let's test our integral function.
+
+#+BEGIN_SRC ipython 
+integral(lambda x: x*x, 0, 1, 0.01)
+#+END_SRC
+
+We can do better using ~scipy~ and its numeric quadrature routines.
+
+#+BEGIN_SRC ipython 
+import scipy.integrate
+
+scipy.integrate.quad( lambda x: x*x, 0, 1 )
+#+END_SRC
+
+The return value is a tuple, the first entry of which is the estimated
+value of the integral, and the second entry of which is an estimate of
+the absolute error.
+
+We can use this numerically compute the antiderivative of a function.
+
+#+BEGIN_SRC ipython 
+def indefinite_integral(f,a): # f is a function, a is an initial condition
+    return lambda x: scipy.integrate.quad( f, a, x )
+#+END_SRC
+
+Let's plot this.
+
+#+BEGIN_SRC ipython 
+%matplotlib inline
+import numpy as np
+import matplotlib.pyplot as plt
+
+xs = np.arange(0, 10, 0.01) 
+
+plt.plot(xs, [np.sin(x) for x in xs])
+plt.plot(xs, [indefinite_integral(np.sin,0)(x) for x in xs])
+plt.show()
+#+END_SRC
+
+You might be wondering about the strange notation involving ~for~ and
+~in~; this is *list comprehension*, quite the Pythonic way to
+construct new lists from old.  To get a feel for this, try:
+
+#+BEGIN_SRC ipython 
+[x**2 for x in range(10)]
+#+END_SRC
+
+* Map versus list comprehensions
+
+You might be familiar with ~map~ and wondering how this relates.  For
+instance, you could also have written the following.
+
+#+BEGIN_SRC ipython 
+list(map(lambda x: x**2, range(10)))
+#+END_SRC
+
+The difference is that ~map~ is lazily evaluated, meaning that you can run code like
+
+#+BEGIN_SRC ipython 
+for s in map(lambda x: x**2, range(10**100)):
+    print(s)
+    if s > 10:
+        break
+#+END_SRC
+
+but if you were to create a *list* with $10^{100}$ entries, you'd run
+out of memory!  Functions like ~map~ are insanely important, but list
+comprehensions are arguably a bit more idiomatic in Python.  But when
+you don't wish to name the parameter and when your function is not
+anonymous, ~map~ is arguably more readable.
+
+* Convolution
+
+Let $f$ and $g$ be functions on the real line, and suppose that $f$ is
+supported on $[a,b]$ (i.e., $f(x) = 0$ for $x \not \in [a,b]$).
+
+The convolution function $f \ast g$ is defined by
+$$
+f\ast g (t) = \int_{a}^b f(\tau) g(t - \tau) \; \mathrm{d}\tau.
+$$
+
+Define a function 'convolution' which takes as input two functions $f$
+and $g$, lower and upper bounds $a$ and $b$ and which outputs the
+convolution of $f$ and $g$.
+
+#+BEGIN_SRC ipython 
+def convolution(f, g, a, b):
+    raise Exception('You must implement convolution.')
+#+END_SRC
+
+The code below will test your convolution function on the ~pulse~
+function as defined as follows.
+
+#+BEGIN_SRC ipython 
+def pulse(x):
+    if x < 0 or x > 1:
+        return 0
+    else:
+        return 1
+#+END_SRC
+
+Let's define the convolution of pulse with pulse.
+#+BEGIN_SRC ipython 
+ff = convolution(pulse, pulse, -4, 4)
+#+END_SRC
+
+Plot it.
+
+#+BEGIN_SRC ipython 
+%matplotlib inline
+import numpy as np
+import matplotlib.pyplot as plt
+
+xs = np.linspace(-3,5,100)
+ys1 = list(map(ff, xs))
+ys2 = list(map(pulse,xs))
+plt.plot(xs, ys1)
+plt.plot(xs,ys2)
+plt.show()
+#+END_SRC
+
+Is this plot what you expect?  If not, how might you fix it?
+
+Reading about the optional ~points~ parameter in the
+[manual](https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.quad.html)
+may help.

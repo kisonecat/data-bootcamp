@@ -1,0 +1,56 @@
+#+TITLE: Plotting for the first time
+#+AUTHOR: Jim Fowler
+
+In what follows, we'll want to rely on some common packages.  Execute
+the following cell.
+
+
+
+
+#+BEGIN_SRC ipython 
+%matplotlib inline
+import matplotlib.pyplot as plt
+import math
+#+END_SRC
+
+By importing ~matplotlib.pyplot~ we gain access to a collection of
+functions that make matplotlib work like MATLAB, meaning a "state
+machine" in which each pyplot function makes some change to a figure
+like creating a figure, creating a plotting area in a figure, plotting
+some lines in a plotting area, decorating the plot with labels, and so
+on.
+
+Note that ~matplotlib.pyplot~ means we are only importing a specific
+module from ~matplotlib~ rather than *all~ the modules.
+
+* A first plot
+
+Let's try making a first plot.
+
+#+BEGIN_SRC ipython 
+plt.plot([1, 2, 4, 9])
+plt.ylabel('a label on the y-axis')
+plt.show()
+#+END_SRC
+
+You may be wondering: Why does the $x$-axis range from zero to three?
+If you provide a single list to the ~plot()~ command, ~matplotlib~
+assumes it is a sequence of $y$ values and automatically generates the
+corresponding $x$ values for you, using the usual pythonic convention
+that indexing starts at 0.
+
+To fix this, try the following:
+
+#+BEGIN_SRC ipython 
+plt.plot([1, 2, 3, 4], [1, 2, 4, 9])
+plt.show()
+#+END_SRC
+
+Try plotting sine by fixing the following.
+
+#+BEGIN_SRC ipython 
+plt.plot([1, 2, 3, 4, 5, 6], [math.sin(1), math.sin(2), math.sin(3), math.sin(4), math.sin(5), math.sin(6)])
+plt.show()
+#+END_SRC
+
+Clearly six points is not enough.  Make a nicer plot of $y = \sin x$.

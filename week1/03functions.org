@@ -55,22 +55,4 @@ def f(x):
 f(5)
 #+END_SRC
 
-* Lambda
 
-Not all students will want to think about ~lambda~, but for students
-with some experience with programming, thinking about ~lambda~ can a
-helpful next step.
-
-#+BEGIN_SRC ipython 
-f = lambda x: x*x
-f(5)
-#+END_SRC
-#+END_SRC
-
-* list comprehension
-
-Python provides some syntactic sugar for building lists.
-
-#+BEGIN_SRC ipython 
-[x**2 for x in range(10)]
-#+END_SRC
