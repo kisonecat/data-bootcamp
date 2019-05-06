@@ -4,7 +4,7 @@ We will meet four days per week for three weeks.  In class, in lieu of
 lecture, we will collectively work through carefully designed Jupyter
 notebooks to develop both your skill in "coding" but especially to
 deepen your perspective on "data science."  After our time together
-each day, you will work through a problem set (ideally in small
+each day, you will work through some homework (ideally in small
 groups) to check your understanding.
 
 At the end of the course, you have the opportunity for a *final
