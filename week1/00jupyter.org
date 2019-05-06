@@ -16,7 +16,6 @@ Click to the left of a cell to enter Command Mode. In Command Mode, type:
 
 - *a* to add cell above
 - *b* to add cell below
-- *d*to delete the cell
 
 Other useful shortcuts can be found [here](http://maxmelnick.com/2016/04/19/python-beginner-tips-and-tricks.html).
 
