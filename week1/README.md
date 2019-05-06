@@ -37,36 +37,48 @@ visualization toolkit.
 - [06matplotlib](06matplotlib.ipynb)
 
 In addition to workbooks that serve as lectures, each class day will
-also provide exercises for you to work through.
+also provide exercises for you to work through.  For the first day,
+your **homework** is to work through some Python exercises.
 
 - [07exercises](07exercises.ipynb)
 
 ## Day 2: Models and simulation
 
-We meet first-class functions with a demo involving scipy.
+We meet first-class functions with a demo involving `scipy`.
 
 - [08scipy](08scipy.ipynb)
 
-We'll also practice running simulations by first simulating coin
-tosses for a fair coin, meaning a coin equally likely to land on heads
-as on tails.
+We'll also practice running simulations involving "random" numbers by
+simulating coin tosses for a fair coin, meaning a coin equally likely
+to land on heads as on tails.
 
 - [09coins](09coins.ipynb)
 
-Having had the experience, your homework is to implement a
-`biased_coin` which will let you produce some graphs of random walks.
+Having some experience with a fair coin, for Day 2 your **homework**
+is to implement a `biased_coin` which will encourage you to produce
+some graphs of random walks.
 
 - [10random-walk](10random-walk.ipynb)
 
 ## Day 3: Linear regression in one variable
 
-The simulations and visualizations encourage us to dig into various
-techniques to summarize, like linear regression in one variable.
+With our simulations and visualizations, we met the *mean* and
+*standard deviation*.  Instead of simulations, today we look at some
+real data.  Let's learn to "wrangle" some data with ~pandas~ first.
+
+- [11pandas](11pandas.ipynb)
+
+Our foray into some statistics encourages us to dig deeper, e.g.,
+today we do some linear regression in one variable.
+
+- [12regression](12regression.ipynb)
+
+For Day 3, your **homework** is to do some exploratory analysis of a
+gapminder dataset.
+
+- [13gapminder](13gapminder.ipynb)
 
 ## Day 4: Estimates and bootstrapping
 
 We "bootstrap" our way to some confidence intervals.
-
-
-
 
