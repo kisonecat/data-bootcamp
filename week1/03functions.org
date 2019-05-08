@@ -39,7 +39,7 @@ def distance(a, b):
     """Determine the distance |a-b| between points a and b on the real line"""
     return abs(a-b)
 
-print(help(distance))
+help(distance)
 #+END_SRC
 
 * Return values

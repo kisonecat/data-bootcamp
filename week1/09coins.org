@@ -42,7 +42,7 @@ def coin():
         return 'T'
 #+END_SRC
 
-* A simulation of a multiple coin tosses
+* A simulation of multiple coin tosses
 
 Let's toss the coin 10 times and look at the result.
 

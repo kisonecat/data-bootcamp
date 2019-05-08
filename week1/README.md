@@ -50,7 +50,7 @@ We meet first-class functions with a demo involving `scipy`.
 
 We'll also practice running simulations involving "random" numbers by
 simulating coin tosses for a fair coin, meaning a coin equally likely
-to land on heads as on tails.
+to land heads as tails.
 
 - [09coins](09coins.ipynb)
 
@@ -78,7 +78,12 @@ gapminder dataset.
 
 - [13gapminder](13gapminder.ipynb)
 
+If you have some extra time, I encourage you to try to fit some
+polynomials to some fake data.  This is a good time to worry about
+underfitting and overfitting.
+
+- [14polyfit](14polyfit.ipynb)
+
 ## Day 4: Estimates and bootstrapping
 
-We "bootstrap" our way to some confidence intervals.
-
+Today we "bootstrap" our way to some confidence intervals.

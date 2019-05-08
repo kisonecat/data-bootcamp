@@ -13,3 +13,95 @@ import matplotlib.pyplot as plt
 df = pd.read_csv('galton.csv')
 #+END_SRC
 
+Let's extend ~df~ with midparent height.
+
+#+BEGIN_SRC ipython 
+df['midparent'] = (df.father + df.mother)/2
+#+END_SRC
+
+* Linear regression
+
+*Supervised learning* means learning the relationship between two sets
+of data: the observed data $X$ and an external variable $y$ that we
+are trying to predict.  Often $y$ is called the "target" (for
+regression) or "labels" (for classification).  Let's load some code
+from ~scikit-learn~ to perform linear regression.
+
+#+BEGIN_SRC ipython 
+from sklearn.linear_model import LinearRegression
+#+END_SRC
+
+Supervised estimators in ~scikit-learn~ (like ~LinearRegression~)
+implement a ~fit~ method to fit the model and a ~predict~ method that
+converts observations into predicted targets or labels.
+
+#+BEGIN_SRC ipython 
+lm = LinearRegression().fit( df[['midparent']], df['height'] )
+#+END_SRC
+
+This provides a slope and intercept.
+
+#+BEGIN_SRC ipython 
+print('height = {m} * midparent + {b}'.format(m = lm.coef_[0], b = lm.intercept_))
+#+END_SRC
+
+Let's plot it.
+
+#+BEGIN_SRC ipython 
+df.plot.scatter('midparent', 'height')
+plt.plot( df['midparent'], lm.predict(df[['midparent']]), color='red', linewidth=3 )
+plt.show()
+#+END_SRC
+
+You could now consult [the documentation of
+~scikit-learn~](https://scikit-learn.org/stable/modules/linear_model.html)
+to try fitting fancier models, perhaps using the heights of both
+parents.
+
+* Is this any good?
+
+By "any good" we mean: is our model valid?  To evaluate the
+performance of the model, we would need to test it on some unseen
+data... but we aren't going to find children and their parents and
+measure their heights.
+
+**Cross-validation** is a solution to the question of "validity" of
+the model, and also a solution to our not having unseen data.  Instead
+of running ~fit~ on *all* the data, we keep aside some portion of the
+data and use that "hold-out" data for validation.
+
+To be more specific, there are various ways of arranging for this.  We
+might *split the data into a training set and a testing set*. 
+
+Another method is *k-fold cross-validation* in which the original data
+is partitioned (randomly) into $k$ equal sized subsamples. Of the $k$
+subsamples, a single subsample is retained as the validation data for
+testing the model, and the remaining $k − 1$ subsamples are used as
+training data.  Conveniently, ~scikit-learn~ has methods for this.
+
+#+BEGIN_SRC ipython 
+from sklearn.model_selection import KFold
+#+END_SRC
+
+Let's use it.
+
+#+BEGIN_SRC ipython 
+model = LinearRegression()
+scores = []
+
+X = df[['midparent']]
+y = df['height']
+
+kf = KFold(n_splits=5, shuffle=True, random_state=1)
+for train_index, test_index in kf.split(X):
+    X_train, X_test = X.iloc[train_index], X.iloc[test_index]
+    y_train, y_test = y.iloc[train_index], y.iloc[test_index]
+    model.fit(X_train, y_train)
+    score = model.score(X_test, y_test)
+    scores.append(score)
+
+scores
+#+END_SRC
+
+Those $R^2$ scores are not especially reassuring.  Can we do better?
+Are we missing something in our model?

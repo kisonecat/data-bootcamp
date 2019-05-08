@@ -1,0 +1,124 @@
+#+TITLE: Fitting polynomials
+#+AUTHOR: Jim Fowler
+
+* Producing some fake data
+
+Let's use ~numpy~ to produce some fake data.
+
+#+BEGIN_SRC ipython 
+import numpy as np
+
+N = 100
+xs = np.random.uniform(0,np.pi,N)
+xs = np.sort(xs) # for plotting later
+ys = np.sin(xs) + np.random.normal(0,0.1,N)
+#+END_SRC
+
+Note that ~xs~ and ~ys~ are not Python lists but rather ~numpy~
+arrays.  For "technical reasons" we'd prefer to restructure the arrays
+as follows.
+
+#+BEGIN_SRC ipython 
+xs = xs[:, np.newaxis]
+ys = ys[:, np.newaxis]
+#+END_SRC
+
+Let's see a plot of our random data.
+
+#+BEGIN_SRC ipython 
+import matplotlib.pyplot as plt
+plt.scatter(xs,ys)
+plt.show()
+#+END_SRC
+
+We now pretend that we don't know the source of this data, and we wish
+to "learn" the relationship between the $x$'s and the $y$'s.  Of
+course, the truth is that $y = \sin x$ plus some noise, but let's
+forget about that and see what we can recover.
+
+* Linear regression
+
+We've been learning about linear regression, so let's use
+~scikit-learn~ to *again* perform linear regression on our data.
+
+#+BEGIN_SRC ipython 
+from sklearn.linear_model import LinearRegression
+lm = LinearRegression().fit( xs, ys )
+#+END_SRC
+
+Let's make a plot our (linear!) model.
+
+#+BEGIN_SRC ipython 
+ys_predicted = lm.predict(xs)
+plt.scatter(xs, ys)
+plt.plot(xs, ys_predicted, color='r')
+plt.show()
+#+END_SRC
+
+Because we followed the usual advice to **look at our data**, we know
+our data isn't modeled well by a straight line.  This is an example of
+*underfitting*.  We need a more complex model to capture the actual
+pattern of the data.
+
+* Use polynomials
+
+We find the "polynomial features" associated to the $x$'s.  This
+replaces the vector $(x) \in \mathbb{R}^1$ with the vector $(1,x,x^2)
+\in \mathbb{R}^3$.
+
+#+BEGIN_SRC ipython 
+from sklearn.preprocessing import PolynomialFeatures
+polynomial_features= PolynomialFeatures(degree=2)
+xs_poly = polynomial_features.fit_transform(xs)
+#+END_SRC
+
+Next we perform linear regression.  A **common misconception** would
+be that *linear* regression is the wrong choice since we want to find
+an approximating polynomial.  Can you explain why we are nevertheless
+using ~LinearRegression~ in an attempt to find a polynomial fit?
+
+#+BEGIN_SRC ipython 
+qm = LinearRegression().fit( xs_poly, ys )
+#+END_SRC
+
+Let's plot the data as a scatterplot, and our model's predicted values
+as a red curve.
+
+#+BEGIN_SRC ipython 
+ys_predicted = qm.predict(xs_poly)
+plt.scatter(xs, ys)
+plt.plot(xs, ys_predicted, color='r')
+plt.show()
+#+END_SRC
+
+That *looks* much better.  Is it "actually" better?
+
+#+BEGIN_SRC ipython 
+print("linear model score:",lm.score(xs,ys))
+print("quadratic model score:",qm.score(xs_poly,ys))
+#+END_SRC
+
+Would a cubic polynomial be an even better choice?
+
+* Overfitting
+
+If degree 2 worked well, surely degree 25 is even better!
+
+#+BEGIN_SRC ipython 
+from sklearn.preprocessing import PolynomialFeatures
+polynomial_features= PolynomialFeatures(degree=25)
+xs_poly = polynomial_features.fit_transform(xs)
+
+lm = LinearRegression().fit( xs_poly, ys )
+
+ys_predicted = lm.predict(xs_poly)
+plt.scatter(xs, ys)
+plt.plot(xs, ys_predicted, color='r')
+plt.show()
+#+END_SRC
+
+Our prediction now is rather wiggly; what we are doing is not so much
+learning the regularities in the data as we are *learning the noise*.
+How could we possibly deal with this?  What sort of framework could
+help us pick "hyperparameters" like degree?  These questions pave the
+way for Week 2, when we study the *bias/variance tradeoff*.
