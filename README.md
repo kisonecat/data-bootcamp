@@ -35,19 +35,21 @@ wrangling" by merging data frames, grouping rows, etc.
 - Day 3: linear regression in one variable
 - Day 4: estimates, bootstrapping
 
-**By the end of [Week 1](week1/README.md)** you will know how to get into a Jupyter
-notebook, wrangle and look at your data, estimate some feature of your
-data, and to quantify how good your estimate is.  In short, [Week 1](week1/README.md)
-prepares you to clean and prepare your data.
+**By the end of [Week 1](week1/README.md)** you will know how to get
+into a Jupyter notebook, wrangle and look at your data, estimate some
+feature of your data, and to quantify how good your estimate is.  In
+short, [Week 1](week1/README.md) prepares you to clean and prepare
+your data.
 
 ## [Week 2: classification and supervised learning](week2/README.md)
 
-[Week 2](week2/README.md) forms the meaty middle of our course; more than estimates, in
-[Week 2](week2/README.md) we aim to make predictions.  One week isn't much time for this!
-But our tools, like `scikit-learn`, make it possible to play in a
-playground full of powerful algorithms before fully understanding how
-those algorithms work.  To address the pedagogical pitfall of too many
-black boxes, we spend some time in [Week 2](week2/README.md) "boosting" our vocabulary
+[Week 2](week2/README.md) forms the meaty middle of our course; more
+than estimates, in [Week 2](week2/README.md) we aim to make
+predictions.  One week isn't much time for this!  But our tools, like
+`scikit-learn`, make it possible to play in a playground full of
+powerful algorithms before fully understanding how those algorithms
+work.  To address the pedagogical pitfall of too many black boxes, we
+spend some time in [Week 2](week2/README.md) "boosting" our vocabulary
 with words like training and testing sets, cross-validation,
 underfitting and overfitting, the bias/variance tradeoff.
 
@@ -56,19 +58,23 @@ underfitting and overfitting, the bias/variance tradeoff.
 - Day 7: logistic regression
 - Day 8: overfitting and regularization
 
-**By the end of [Week 2](week2/README.md)** you will do some machine learning, e.g., take
-some labeled training data and predict the labels on the testing set.
-In other words, [Week 2](week2/README.md) prepares you to train and test a model.
+**By the end of [Week 2](week2/README.md)** you will do some machine
+learning, e.g., take some labeled training data and predict the labels
+on the testing set.  In other words, [Week 2](week2/README.md)
+prepares you to train and test a model.
 
 ## [Week 3: clustering and unsupervised learning](week3/README.md)
 
 In this final week, we encourage you to seek out data sets that speak
-to you personally.  As always, the first step is to **look at your
-data** but your chosen data might be high-dimensional or otherwise
-hard to explore.  So this week we consider clustering algorithms
-(k-means, and hierarchical clustering) and we use some linear algebra
-(e.g., singular value decomposition) to reduce the dimension of our
-data.
+to you personally.  We've prepared [a list of places to find
+data](DATA.md) if you're having trouble finding a data set to play
+with.
+
+As always, the first step is to **look at your data** but your chosen
+data might be high-dimensional or otherwise hard to explore.  So this
+week we consider clustering algorithms (k-means, and hierarchical
+clustering) and we use some linear algebra (e.g., singular value
+decomposition) to reduce the dimension of our data.
 
 - Day 9: high-dimensional data, correlation
 - Day 10: k-means

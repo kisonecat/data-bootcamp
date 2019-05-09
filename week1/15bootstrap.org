@@ -1,0 +1,133 @@
+#+TITLE: Bootstrap
+#+AUTHOR: Jim Fowler
+
+* Producing some fake data
+
+Let's again use ~numpy~ to produce some fake data.
+
+#+BEGIN_SRC ipython 
+import numpy as np
+
+p = 0.75
+trials = 30
+flips = np.random.uniform(0,1,trials) < p
+#+END_SRC
+
+Think back to the ~09coins~ notebook and then think back to your
+homework assignment that involved building a biased coin.  This is a
+similar setup, but perhaps you are impressed by how short the code is?
+Clearly ~numpy~ is quite expressive.
+
+** Play pretend
+
+With this data, because we constructed it by hand, we already *know*
+the truth: we flipped the biased coin ~trials = 50~ times, and ~p =
+0.75~ tells us exactly how the coin was weighted.  But let's pretend
+we didn't know this; let's pretend we only saw the ~flips~ and we do
+*not* know ~p~.
+
+* Our first estimate
+
+How then would we estimate ~p~?  We'd first take an average.
+
+#+BEGIN_SRC ipython 
+sum(flips) / trials
+#+END_SRC
+
+But how good is this estimate?  (If you don't quantify the error, $\pi
+\approx 17$).  Ideally, we'd just flip the coin 50 more times, over
+and over again, i.e., just keep taking more random samples from the
+population.  If we draw random samples from a population and then look
+at the distribution of the estimates, we get the [sampling
+distribution for a
+statistic](https://en.wikipedia.org/wiki/Sampling_distribution).
+Recall that is what we did in ~09coins~ but, in many real-world cases,
+getting more data would be completely impractical.
+
+Instead of randomly drawing samples from the population (which we
+can't easily do), we randomly draw samples from the *data we already
+have*, i.e., from the empirical distribution of the observed data.
+
+This technique is
+[bootstrapping](https://en.wikipedia.org/wiki/Bootstrapping_(statistics))
+and permits us to estimate the sampling distribution of statistics
+computed via complicated formulas.
+
+* To a confidence interval
+
+We perform the resampling with replacement (!) quite easily with
+~numpy~.
+
+#+BEGIN_SRC ipython 
+flips_resampled = np.random.choice(flips,size=trials,replace=True)
+#+END_SRC
+
+We can then compute the statistic on the resampled data.
+
+#+BEGIN_SRC ipython 
+sum(flips_resampled) / trials
+#+END_SRC
+
+Let's repeat this ~N = 10000~ times.
+
+#+BEGIN_SRC ipython 
+N = 10000
+flips_resampled = np.random.choice(flips,size=(N,trials),replace=True)
+#+END_SRC
+
+Now we compute means by summing along the appropriate axis.
+
+#+BEGIN_SRC ipython 
+means = np.sum( flips_resampled, axis=1 ) / trials
+#+END_SRC
+
+We can plot a histogram of the bootstrapped means.
+
+#+BEGIN_SRC ipython 
+import matplotlib.pyplot as plt 
+plt.hist(means)
+plt.show()
+#+END_SRC
+
+We can use ~np.percentile~ to find a 95% confidence interval.
+
+#+BEGIN_SRC ipython 
+print( '95% CI [{},{}]'.format( np.percentile( means, 2.5 ), np.percentile( means, 97.5 ) ) )
+#+END_SRC
+
+** No loops?
+
+Are you surprised that we did not use any ~for~ loops in this calculation?
+
+** What did people do historically?
+
+What we're really doing here is computing a [binomial proportion
+confidence interval]
+(https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval)
+and this might be computed by making some approximation, e.g.,
+approximating with a normal distribution.  With the bootstrap, we
+don't need to make some assumption like this to facilitate an analytic
+approximation but instead rely on the computer to perform the
+resampling.  If we were to rely on such an approximation (which is not
+so bad when ~trials~ is large and ~p~ is far from 0 and 1), our
+confidence interval is
+
+#+BEGIN_SRC ipython 
+radius = 1.96 * np.sqrt( sum(flips) * (trials - sum(flips) ) / trials ) / trials
+print( '95% CI [{},{}]'.format( sum(flips) / trials - radius, sum(flips) / trials + radius ) )
+#+END_SRC
+
+* Your homework
+
+** Other statistics
+
+We've used the bootstrap to produce a confidence interval for the
+mean.  Find some other data set you like, and do the same for the
+median (or the "trimmed mean").
+
+** Rewrite with loops
+
+Take the code above (which carefully avoided loops) and reimplement it
+*with* some ~for~ loops.  How fast is your code?  (If you don't notice
+a difference, increase ~N~ until you can feel it.)
+

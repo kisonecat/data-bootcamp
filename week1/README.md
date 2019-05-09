@@ -78,12 +78,25 @@ gapminder dataset.
 
 - [13gapminder](13gapminder.ipynb)
 
-If you have some extra time, I encourage you to try to fit some
-polynomials to some fake data.  This is a good time to worry about
+## Day 4: Estimates and bootstrapping
+
+We've previously thought about a specific model, namely linear
+regression.  Now I encourage you to try to fit some polynomials to
+some fake data.  This provides our initial introduction to
 underfitting and overfitting.
 
 - [14polyfit](14polyfit.ipynb)
 
-## Day 4: Estimates and bootstrapping
+But the main goal for today is to "bootstrap" our way to some
+confidence intervals.
 
-Today we "bootstrap" our way to some confidence intervals.
+- [15bootstrap](15bootstrap.ipynb)
+
+# Reflect on Week 1
+
+You've learned some Python!  You can get into a Jupyter notebook,
+wrangle and look at some real-world data, model your data with
+`scikit-learn`, estimate features of your data, and even quantify how
+good your estimate is with confidence intervals.
+
+This is an excellent first step on your way to becoming a data scientist.
