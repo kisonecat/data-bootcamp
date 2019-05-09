@@ -109,4 +109,5 @@ This is an excellent first step on your way to becoming a data scientist.
 You've also met a ton of packages, including `numpy` and `scipy` and
 `scikit-learn` and `matplotlib` and `pandas`.  In our modern world,
 "programming" increasingly means being able to understand not only a
-language, but its whole ecosystem of common packages and the idioms that those packages encourages.
+language, but its whole ecosystem of common packages and the idioms
+that those packages encourage.
