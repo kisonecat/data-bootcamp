@@ -92,6 +92,11 @@ confidence intervals.
 
 - [15bootstrap](15bootstrap.ipynb)
 
+Although we've already been using it, we should also be formally
+introduced to `numpy`.
+
+- [16numpy](16numpy.ipynb)
+
 # Reflect on Week 1
 
 You've learned some Python!  You can get into a Jupyter notebook,
@@ -100,3 +105,8 @@ wrangle and look at some real-world data, model your data with
 good your estimate is with confidence intervals.
 
 This is an excellent first step on your way to becoming a data scientist.
+
+You've also met a ton of packages, including `numpy` and `scipy` and
+`scikit-learn` and `matplotlib` and `pandas`.  In our modern world,
+"programming" increasingly means being able to understand not only a
+language, but its whole ecosystem of common packages and the idioms that those packages encourages.

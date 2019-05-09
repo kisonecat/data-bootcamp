@@ -1,0 +1,148 @@
+#+TITLE: Meet numpy
+#+AUTHOR: Jim Fowler
+
+We've been using it, but let's be officially introduced to ~numpy~, a
+fundamental package for scientific computing in Python. The big
+feature of ~numpy~ is its multidimensional array object, but it also
+includes a large collection of high-level mathematical functions to
+operate on such arrays.
+
+Let's import ~numpy~ now.
+
+#+BEGIN_SRC ipython 
+import numpy as np
+#+END_SRC
+
+* Building arrays
+
+Given a Python list, we can produce a ~numpy~ array.
+
+#+BEGIN_SRC ipython 
+triangular_numbers = np.array([x*(x+1)/2 for x in range(10)])
+#+END_SRC
+
+We could also build an array of triangular numbers by termwise multiplication.
+
+#+BEGIN_SRC ipython 
+triangular_numbers_again = np.array([range(10)]) * np.array([range(1,11)]) / 2
+#+END_SRC
+
+If you just want a list of zeroes, you use ~np.zeros~.
+
+#+BEGIN_SRC ipython 
+zs = np.zeros( 17 )
+zs
+#+END_SRC
+
+We use ~np.linspace~ to produce a linearly spaced list of floats.
+
+#+BEGIN_SRC ipython 
+x = np.linspace( 0, 17, 100 )
+x
+#+END_SRC
+
+* Note the avoidance of loops
+
+By relying on ~ndarray~, the ~numpy~ package provides vectorized
+arithmetic operations.
+
+We might have written something like this before.
+
+#+BEGIN_SRC ipython
+import math
+xs = np.linspace( 0, 6, 100 )
+ys = np.zeros( 100 )
+for i in range(100):
+  ys[i] = math.sin(xs[i])
+#+END_SRC
+
+But ~numpy~ provides standard mathematical functions for fast
+operations on *entire arrays* of data without having to write loops.  For instance, the above code can be written as follows.
+
+#+BEGIN_SRC ipython
+xs = np.linspace( 0, 6, 100 )
+ys = np.sin(xs)
+#+END_SRC
+
+We didn't even use ~map~ or list comprehension.
+
+* Multi-dimensional arrays
+
+We can convert a Python list of Python lists into a multidimensional array.
+
+#+BEGIN_SRC ipython 
+m = np.array([[i+j for i in range(4)] for j in range(4)])
+#+END_SRC
+
+That looks a lot like a "matrix" -- meaning a square array of numbers.
+Does multiplication do what you expect?
+
+#+BEGIN_SRC ipython 
+m*m
+#+END_SRC
+
+Compare that with ~np.matmul~.
+
+#+BEGIN_SRC ipython 
+np.matmul(m,m)
+#+END_SRC
+
+Can you figure out how to multiply a matrix by a vector in ~numpy~?
+
+* Even higher-dimensional arrays
+
+Let's build ~N~ matrices, each $5 \times 5$, with their entries drawn
+from a normal distribution.
+
+#+BEGIN_SRC ipython 
+N = 10000
+dimension = 10
+matrices = np.random.normal(0,1,size=(N,dimension,dimension))
+#+END_SRC
+
+Let's find their eigenvalues.
+
+#+BEGIN_SRC ipython 
+es = np.linalg.eigvals(matrices)
+#+END_SRC
+
+We can ~reshape~ that $N$-by-$5$ array into a list with $5N$ entries.
+
+#+BEGIN_SRC ipython 
+es = es.reshape(N * dimension)
+#+END_SRC
+
+And we can restructure that into a $(5N,2)$ array of reals.
+
+#+BEGIN_SRC ipython 
+es = np.stack((es.real,es.imag),-1)
+es = es[es[:,1] != 0] # throw away real eigenvalues
+real_part = es[:,0]
+imag_part = es[:,1]
+#+END_SRC
+
+Let's see a plot of the eigenvalues.
+
+#+BEGIN_SRC ipython 
+import matplotlib.pyplot as plt
+plt.hexbin(real_part,imag_part)
+plt.show()
+#+END_SRC
+
+You may enjoy reading more about [random
+matrices](https://en.wikipedia.org/wiki/Random_matrix).  For instance,
+what happens if you change the distribution from which we draw the
+entries of the matrices?
+
+* Why does this feel so weird?
+
+Much of the challenge of becoming proficient with ~numpy~ is the same
+challenge as becoming proficient with MATLAB; instead of writing
+loops, you should think of how to structure your computations in terms
+of arrays from the start.
+
+There are conceptual advantages to this as well, because often loops
+are more about "how" a computation might take place, but by thinking
+at the higher level of abstraction of $n$-dimensional arrays, you may
+be forced to confront more directly the *meaning* of the computation.
+The code we write is not so much for machines as it is for people.
