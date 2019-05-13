@@ -1,0 +1,160 @@
+#+TITLE: The MNIST dataset
+#+AUTHOR: Jim Fowler
+
+* The MNIST dataset
+
+You may not know that ~scikit-learn~ includes a collection of toy
+datasets.  One of these is the ever-popular MNIST database (Modified
+National Institute of Standards and Technology database), a database
+of handwritten digits which is quite the popular target for machine
+learning courses.  Let's load it.
+
+#+BEGIN_SRC ipython 
+from sklearn import datasets
+digits = datasets.load_digits()
+#+END_SRC
+
+What is this?  The images are available under `digits.images`.
+
+#+BEGIN_SRC ipython 
+print('{} images'.format(digits.images.shape[0]))
+#+END_SRC
+
+Each image is an $8 \times 8$ array of numbers between 0 and 16,
+inclusive.  Let's use ~imshow~ to see one of them.
+
+#+BEGIN_SRC ipython 
+%matplotlib inline
+import matplotlib.pyplot as plt
+def show_image(i):
+    print("handwritten digit {}".format( digits.target[i] ) )
+    plt.imshow(digits.images[i])
+    plt.show()
+show_image(17)
+#+END_SRC
+
+The underlying data is stored in ~digits.data~.  Our goal is to learn
+how to relate the content in ~digits.data~ to the labels in
+~digits.target~.
+
+**Warning:** This data is highly preprocessed to center the
+handwritten digits, threshold the bitmaps, etc.  This makes it a
+popular dataset when practicing machine learning algorithms, precisely
+because it isn't particularly painful.
+
+* Some data for a supervised classification task
+
+We conventionally use ~X~ and ~y~ for the data and the labels.  We also want to split into a testing set and a training set.
+
+#+BEGIN_SRC ipython 
+from sklearn.model_selection import train_test_split 
+
+X = digits.data
+y = digits.target
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, stratify=y)
+#+END_SRC
+
+It's hilariously easy to set up a $k$-nearest neighbors classifier.
+
+#+BEGIN_SRC ipython 
+from sklearn.neighbors import KNeighborsClassifier 
+knn = KNeighborsClassifier(n_neighbors=5)
+knn.fit(X_train, y_train)
+print(knn.score(X_test, y_test))
+#+END_SRC
+
+In this case, ~KNeighborsClassifier~ is calculating the distance to
+nearby images, finding the $k$ nearest, and those $k$ neighbors vote
+for the label.  Note that ~fit~ essentially takes no time, because all
+~fit~ does is store all the training data.  This results in "large"
+models that require quite a bit memory.  Moreover, ~predict~ is slow
+if there are many points, because it is costly to search for nearby
+neighbors.
+
+We use ~sklearn.metrics~ to understand how well our model works.
+
+#+BEGIN_SRC ipython 
+from sklearn import metrics
+predicted = knn.predict(X_test)
+metrics.classification_report(y_test, predicted)
+#+END_SRC
+
+A key idea in classifiers is a [confusion
+matrix](https://en.wikipedia.org/wiki/Confusion_matrix) which helps us
+understand if our model is systematically misclassifying certain inputs.
+
+#+BEGIN_SRC ipython 
+metrics.confusion_matrix(y_test, predicted)
+#+END_SRC
+
+* Try other models
+
+And ~scikit-learn~ provides a bunch of other classifiers to choose from.  Like a support vector machine with a linear kernel.
+
+** Support vector machines with linear kernel
+
+#+BEGIN_SRC ipython 
+from sklearn.svm import SVC
+model = SVC(kernel="linear", C=0.025)
+model.fit(X_train, y_train)
+print(model.score(X_test, y_test))
+#+END_SRC
+
+** Support vector machines with radial basis functions
+
+#+BEGIN_SRC ipython 
+from sklearn.svm import SVC
+model = SVC(gamma=0.05, C=5)
+model.fit(X_train, y_train)
+print(model.score(X_test, y_test))
+#+END_SRC
+
+** Decision trees
+
+#+BEGIN_SRC ipython 
+from sklearn.tree import DecisionTreeClassifier
+model = DecisionTreeClassifier(max_depth=10)
+model.fit(X_train, y_train)
+print(model.score(X_test, y_test))
+#+END_SRC
+
+** Logistic regression
+
+#+BEGIN_SRC ipython 
+from sklearn.linear_model import LogisticRegression
+model = LogisticRegression(solver='lbfgs', max_iter=10000)
+model.fit(X_train, y_train)
+print(model.score(X_test, y_test))
+#+END_SRC
+
+** Random forests
+
+#+BEGIN_SRC ipython 
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
+model = RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1)
+model.fit(X_train, y_train)
+print(model.score(X_test, y_test))
+#+END_SRC
+
+* How many neighbors should we use?
+
+#+BEGIN_SRC ipython 
+scores = {}
+
+for k in range(1,20):
+    knn = KNeighborsClassifier(n_neighbors=k)
+    knn.fit(X_train, y_train)
+    scores[k] = knn.score(X_test, y_test)
+
+plt.plot(scores.keys(), scores.values())
+plt.xlabel('k')
+plt.ylabel('score')
+plt.show()
+#+END_SRC
+
+* Homework
+
+Instead of making a single test/train split, use
+~sklearn.model_selection.KFold~ to get a sense of the distribution of
+model scores.

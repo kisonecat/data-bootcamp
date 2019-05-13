@@ -1,0 +1,102 @@
+#+TITLE: Anscombe's quartet
+#+AUTHOR: Jim Fowler
+
+Throughout our time together, a common refrain has been to **look at
+your data**.
+
+We'll look at four data sets today, using our usual tools of ~numpy~ and ~matplotlib~.
+
+#+BEGIN_SRC ipython 
+import numpy as np
+import matplotlib.pyplot as plt
+#+END_SRC
+
+* Some sample data
+
+Here are four datasets known as *Anscombe's quartet* constructed in
+1973 by the statistician Francis Anscombe.  Each dataset consists of
+eleven *(x,y)* pairs.
+
+#+BEGIN_SRC ipython
+x1 = [10.0,8.0,13.0,9.0,11.0,14.0,6.0,4.0,12.0,7.0,5.0]
+y1 = [8.04,6.95,7.58,8.81,8.33,9.96,7.24,4.26,10.84,4.82,5.68]
+
+x2 = [10.0,8.0,13.0,9.0,11.0,14.0,6.0,4.0,12.0,7.0,5.0]
+y2 = [9.14,8.14,8.74,8.77,9.26,8.10,6.13,3.10,9.13,7.26,4.74]
+
+x3 = [10.0,8.0,13.0,9.0,11.0,14.0,6.0,4.0,12.0,7.0,5.0]
+y3 = [7.46,6.77,12.74,7.11,7.81,8.84,6.08,5.39,8.15,6.42,5.73]
+
+x4 = [8.0,8.0,8.0,8.0,8.0,8.0,8.0,19.0,8.0,8.0,8.0]
+y4 = [6.58,5.76,7.71,8.84,8.47,7.04,5.25,12.50,5.56,7.91,6.89]
+
+xs = [x1,x2,x3,x4]
+ys = [y1,y2,y3,y4]
+#+END_SRC
+
+* Some statistics
+
+Many descriptive statistics for these four data sets are the same.
+Let's check this.
+
+** mean of the *x*'s
+
+#+BEGIN_SRC ipython 
+np.mean(xs,axis=1)
+#+END_SRC
+
+** mean of the *y*'s
+
+#+BEGIN_SRC ipython 
+np.mean(ys,axis=1)
+#+END_SRC
+
+** variance
+
+#+BEGIN_SRC ipython
+np.var(xs,axis=1)
+#+END_SRC
+
+#+BEGIN_SRC ipython 
+np.var(ys,axis=1)
+#+END_SRC
+
+** correlations
+
+#+BEGIN_SRC ipython
+print(np.correlate(x1,y1)) 
+print(np.correlate(x2,y2)) 
+print(np.correlate(x3,y3)) 
+print(np.correlate(x4,y4)) 
+#+END_SRC
+
+** linear regression
+
+#+BEGIN_SRC ipython
+print(np.linalg.lstsq([[x,1] for x in x1],y1,rcond=-1)[0])
+print(np.linalg.lstsq([[x,1] for x in x2],y2,rcond=-1)[0])
+print(np.linalg.lstsq([[x,1] for x in x3],y3,rcond=-1)[0])
+print(np.linalg.lstsq([[x,1] for x in x4],y4,rcond=-1)[0])
+#+END_SRC
+
+* Look at the data!
+
+#+BEGIN_SRC ipython
+plt.scatter(x1,y1)
+plt.show()
+#+END_SRC
+
+#+BEGIN_SRC ipython
+plt.scatter(x2,y2)
+plt.show()
+#+END_SRC
+
+#+BEGIN_SRC ipython
+plt.scatter(x3,y3)
+plt.show()
+#+END_SRC
+
+#+BEGIN_SRC ipython
+plt.scatter(x4,y4)
+plt.show()
+#+END_SRC

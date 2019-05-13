@@ -1,0 +1,165 @@
+#+TITLE: Bias-variance tradeoff
+#+AUTHOR: Jim Fowler
+
+* What does learning mean?
+
+What does "learning" even mean?  At a given $x$, what we *measure* is
+$y = f(x) + \epsilon$ where $f$ is some (deterministic!) function and
+$\epsilon$ is noise with mean 0 and variance $\sigma^2$.  By
+performing many measurements, we get many pairs $(x_i,y_i)$.  Via some
+supervised learning algorithm, we produce a function $\hat{f}$.
+
+Hopefully $(y - \hat{f}(x))^2$ is small.  If we succeed in producing
+such an $\hat{f}$, we might say "we have learned $f$."
+
+* Bias and variance
+
+We define bias by $\mathrm{Bias}[\hat{f}(x)] =
+\mathbb{E}[\hat{f}(x)] - f(x)$.  This is the difference between the
+expected prediction of our model and the truth.
+
+We define variance by $\mathrm{Var}[\hat{f}(x)] =
+\mathbb{E}[\hat{f}(x)^2] - \mathbb{E}[\hat{f}(x)]^2$.  This is
+capturing the variability of the model prediction.
+
+Then just *from algebra* we note that, for a previously unseen sample $x$, $\mathbb{E}\left[ (y -
+\hat{f}(x))^2 \right] = \left( \mathrm{Bias}[\hat{f}(x)] \right)^2 +
+\mathrm{Var}[\hat{f}(x)] + \sigma^2$.  But $\mathbb{E}\left[ (y -
+\hat{f}(x))^2 \right]$ is the expected value of the squared error
+between what we see ($y$) and what our model predicts ($\hat{f}(x)$),
+and the algebra then shows this to be the sum of three nonnegative
+terms.  The noise in our data (with variance $\sigma^2$) provides a
+lower bound for the expected error on unseen data.
+
+The consequence is a **bias-variance tradeoff**.  There are low-bias,
+high-variance models like k-nearest neighbors; there are high-bias,
+low-variance models like linear regression.
+
+* Produce some fake data to see this
+
+We recall how we handled this back for polynomial fitting.
+
+#+BEGIN_SRC ipython 
+import matplotlib.pyplot as plt
+import numpy as np
+
+N = 15
+
+f = np.sin
+min_x = 0
+max_x = 3*np.pi
+
+def noise():
+    return np.random.normal(0,0.5,N)
+
+def some_data():
+    xs = np.random.uniform(min_x, max_x,N)
+    xs = np.sort(xs)
+    ys = f(xs) + noise()
+    xs = xs.reshape(N,1)
+    ys = ys.reshape(N,1)
+    return xs, ys
+#+END_SRC
+
+Earlier we said $y = f(x) + \epsilon$, and here we wrote ~ys = f(xs) + noise()~.  
+
+As always, we **look at our data** before continuing.
+
+#+BEGIN_SRC ipython 
+xs, ys = some_data()
+
+import matplotlib.pyplot as plt
+plt.scatter(xs,ys)
+plt.show()
+#+END_SRC
+
+Let's pick a test point ~x_test~.
+
+#+BEGIN_SRC ipython 
+x_test = (max_x + min_x)/2.0
+
+def y_test():
+    return f(x_test) + noise()[0]
+#+END_SRC
+
+* The model
+
+We said that we'd produce a function $\hat{f}$.  Let's do that now.
+In this case, $\hat{f}$ will be denoted ~fhat(d,x)~ where ~d~ refers
+to the degree of the polynomial approximation.
+
+#+BEGIN_SRC ipython 
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import PolynomialFeatures
+
+def fhat(d, x):
+    xs, ys = some_data()
+
+    polynomial_features = PolynomialFeatures(degree=d)
+    xs_poly = polynomial_features.fit_transform(xs)
+    model = LinearRegression().fit( xs_poly, ys )
+
+    x_poly = polynomial_features.fit_transform([[x]])
+    y_predicted = model.predict( x_poly )
+
+    return y_predicted
+#+END_SRC
+
+Note that ~fhat~ is stochastic.
+
+* Expectation, in Python
+
+To make the Python look more like "mathematics," define expected value
+as follows.
+
+#+BEGIN_SRC ipython 
+def expectation(g):
+    return np.mean( [g() for _ in range(1000) ] )
+#+END_SRC
+
+Then we can write code like this.
+
+#+BEGIN_SRC ipython 
+expectation(lambda: np.random.normal(17,1) )
+#+END_SRC
+
+Hopefully $(y - \hat{f}(x))^2$ is small.  If we succeed in producing
+such an $\hat{f}$, we say that we've learned $f$.
+
+* Bias and variance
+
+We want to control $\mathbb{E}\left[ (y - \hat{f}(x))^2 \right]$.
+Using a degree $d$ model, we denote this quantity by ~error(d)~.
+
+#+BEGIN_SRC ipython 
+def error(d):
+    return expectation( lambda: (y_test() - fhat(d,x_test)) ** 2 )
+#+END_SRC
+
+Recall that $\mathrm{Bias}[\hat{f}(x)] = \mathbb{E}[\hat{f}(x)] - f(x)$.
+
+#+BEGIN_SRC ipython 
+def bias(d):
+    return (expectation( lambda: fhat(d,x_test) ) - f(x_test) )
+#+END_SRC
+
+Recall $\mathrm{Var}[\hat{f}(x)] = \mathbb{E}[\hat{f}(x)^2] - \mathbb{E}[\hat{f}(x)]^2$.
+
+#+BEGIN_SRC ipython 
+def variance(d):
+    return expectation( lambda: fhat(d,x_test) ** 2 ) - expectation( lambda: fhat(d,x_test) ) ** 2
+#+END_SRC
+
+Then we can see how bias and variance are affected by degree, which
+plays the role of model complexity.
+
+#+BEGIN_SRC ipython 
+degrees = range(1,9)
+plt.plot(degrees, [bias(d)**2 for d in degrees],label='squared bias')
+plt.plot(degrees, [variance(d) for d in degrees],label='variance')
+plt.plot(degrees, [error(d) for d in degrees], label='error')
+plt.legend()
+plt.xlabel('degree')
+plt.ylabel('error')
+plt.show()
+#+END_SRC

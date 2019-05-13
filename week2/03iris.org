@@ -1,0 +1,137 @@
+#+TITLE: The iris datasetimport matplotlib.pyplot as plt
+#+AUTHOR: Jim Fowler
+
+* The data set
+
+There are a number of data sets, like the MNIST handwritten digits
+dataset, which have become classics in data science courses.  The
+"iris" dataset is another such classic.
+
+Your homework for today is to attack this iris dataset.  This is
+arguably the *best known* dataset in the pattern recognition
+literature.
+
+#+BEGIN_SRC ipython 
+from sklearn import datasets
+iris = datasets.load_iris()
+#+END_SRC
+
+In this case, ~iris.data~ gives the sepal length and width and the
+petal length and width of some Iris plants.
+
+#+BEGIN_SRC ipython 
+iris.data
+#+END_SRC
+
+A human has classified these plants into one of three species, *Iris
+setosa*, *Iris versicolour*, and *Iris virginic*.  Thes species are
+referred to as 0, 1, 2 (as seen in ~iris.target_names~) with the
+labels for each plant provided in ~iris.target~.
+
+#+BEGIN_SRC ipython 
+iris.target
+#+END_SRC
+
+* To a dataframe
+
+This is chance to be exposed to more "data wrangling."  In this case,
+we want to combine the ~iris~ data and labels into a single dataframe.
+
+#+BEGIN_SRC ipython 
+import pandas as pd
+df_data = pd.DataFrame(iris.data,columns=iris.feature_names)
+df_targets = pd.DataFrame( iris.target_names[iris.target], columns=['species'] )
+df = pd.concat( [df_data, df_targets], axis=1 )
+#+END_SRC
+
+* Look at your data
+
+The first thing to do *always* is to **look at your data.**
+
+Let's make some graphs.  This isn't the fastest way to make some
+plots, but it is fairly flexible and demonstrates ~plt.subplots~.
+
+#+BEGIN_SRC ipython 
+%matplotlib inline
+import matplotlib.pyplot as plt
+from itertools import cycle
+color = cycle('bgrcmk')
+
+fig, ax = plt.subplots()
+
+for s in pd.unique(df['species']):
+  plants = df[df['species'] == s]
+  plants.plot.scatter('sepal length (cm)', 'petal width (cm)', 
+                      label=s, c=next(color), ax=ax)
+plt.legend()
+plt.show()
+#+END_SRC
+
+Do you notice how *setosa* can be (linearly) separated from the other
+two?  To make things a bit easier in what follows, let's just consider
+*two* input dimensions.
+
+#+BEGIN_SRC ipython 
+import numpy as np
+X = np.stack( [iris.data[:,0], iris.data[:,3]], axis=1 )
+y = iris.target
+#+END_SRC
+
+* Homework 1
+
+Train a classification model on this *two-dimensional* data.  Your
+model (with the usual ~predict~ method) should be called ~model~.
+
+#+BEGIN_SRC ipython 
+model = ???
+model.fit(X, y)
+#+END_SRC
+
+* Decision boundaries
+
+A *decision boundary* is the hypersurface that partitions the
+underlying space into sets, one for each class. The classifier will
+classify all the points on one side of the decision boundary as
+belonging to one class and all those on the other side as belonging to
+another class.
+
+Let's draw a part of the decision boundary for your model.  You can
+improve the drawing code below (e.g., match the filled contour plot
+colors to the scatterplot colors).
+
+#+BEGIN_SRC ipython 
+%matplotlib inline
+from itertools import cycle
+
+color_cycle = cycle('bgrcmk')
+colors = {}
+for s in pd.unique(df['species']):
+    colors[s] = next(color_cycle)
+
+fig, ax = plt.subplots()
+
+xs = np.linspace( min(df['sepal length (cm)']), max(df['sepal length (cm)']), 50 )
+ys = np.linspace( min(df['petal width (cm)']), max(df['petal width (cm)']), 50 )
+x0, x3 = np.meshgrid(xs, ys)
+
+grid = np.stack( [x0,x3], axis=2 )
+predicted = model.predict(np.reshape(grid,(2500,2)))
+
+plt.contourf(xs, ys, np.reshape(predicted,(50,50)), [-0.5,0.5,1.5,2.5])
+
+for s in pd.unique(df['species']):
+  plants = df[df['species'] == s]
+  plants.plot.scatter('sepal length (cm)', 'petal width (cm)', 
+                      label=s, c=colors[s], ax=ax)
+
+plt.show()
+#+END_SRC
+
+I encourage you to change your model and see how the decision boundary
+is affected.
+
+* Homework 2
+
+Train a classifier on the *four-dimensional* iris data.
+
+Does it work better?
