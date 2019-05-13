@@ -1,0 +1,107 @@
+#+TITLE: Cost function
+#+AUTHOR: Jim Fowler
+
+A *cost function* is sometimes called a *loss* function.  Speaking
+very generally, this is some quantity to be minimized.  In our
+specific context, the "cost" is a measure of the wrongness of the
+model, and we want to wiggle the parameters to minimize this
+wrongness.
+
+Because we want to get a look inside the black boxes, we'll play with
+this idea just using ~numpy~ and *without* using the whole power of
+~scikit-learn~.
+
+#+BEGIN_SRC ipython 
+import numpy as np
+import matplotlib.pyplot as plt
+#+END_SRC
+
+* The fake data
+
+Let's generate some fake data.
+
+#+BEGIN_SRC ipython 
+N = 100
+original_m = m = np.random.normal(1,2)
+original_b = b = np.random.normal(1,2)
+X = np.random.uniform(5,10,N)
+y = m * X + b + np.random.normal(0,0.1,N)
+
+plt.scatter(X,y)
+plt.show()
+#+END_SRC
+
+As we've rigged it, these ~N~ data points are near the line ~y = mx + b~.
+
+Let's forget that we know about ~m~ and ~b~, and try to *deduce* ~m~
+and ~b~ from the data ~X~ and ~y~.
+
+* The cost function
+
+Given parameters ~m~ and ~b~, the average of the squared errors can
+serve as our cost function.
+
+#+BEGIN_SRC ipython 
+def cost(m,b):
+    return np.mean( (y - (m * X + b)) ** 2 )
+#+END_SRC
+
+Note that even our chosen value of ~m~ and ~b~ doesn't make
+~cost(m,b)~ vanish, because there is some noise in the data ~y~.
+
+* Minimizing cost
+
+In this case, we have *least squares* available to us to minimize the
+cost function.
+
+#+BEGIN_SRC ipython 
+(best_m, best_b) = np.linalg.lstsq([[x,1] for x in X], y)[0]
+print(cost(original_m,original_b))
+print(cost(best_m,best_b))
+goal = cost(best_m,best_b) + 0.001
+#+END_SRC
+
+* Stochastic gradient descent
+
+If we are standing at $(m,b)$, we could likely reduce $Q$ by moving in
+the direction of negative gradient.  So we subtract off the a small
+multiple of the gradient of $Q$; this multiple is $\eta$, the
+*learning rate*.  We let $\eta$ decay as we repeat this procedure of
+*gradient descent*.
+
+Note that ~cost~ has a special structure, namely it is the average $Q$
+of cost functions $Q_i$ associated to the $i$th data point.  That is,
+$Q(m,b)={\frac {1}{N}}\sum_{i=1}^{N}Q_{i}(m,b)$.  Often $N$ is very
+large and computing $\nabla Q_i$ could be expensive, so we shuffle the
+indices and only subtract off a few $\nabla Q_i$'s.  This is
+*stochastic* gradient descent.
+
+For this example, let's just subtract one of the $Q_i$ by randomly
+choosing an index with ~np.random.randint(0,len(X))~.
+
+#+BEGIN_SRC ipython 
+def sgd_step(m,b,eta):
+    i = np.random.randint(0,len(X))
+    gradm = 2*X[i]*(m*X[i] + b - y[i])
+    gradb = 2*(m*X[i] + b - y[i])
+    return ( m - eta * gradm, b - eta * gradb )
+#+END_SRC
+
+We pick random values of ~m~ and ~b~, and then repeat this ~sgd_step~
+until our ~cost~ function is small enough.  As we do so, the learning
+rate decays.
+
+#+BEGIN_SRC ipython 
+def sgd():
+    m, b = np.random.normal(size=2)
+    t = 1
+    while cost(m,b) > goal:
+        eta = 0.01 * (0.99 ** (t / N))
+        t = t + 1
+        m, b = sgd_step(m, b, eta)
+        print( cost(m,b) )
+    return m, b
+
+sgd()
+#+END_SRC
+

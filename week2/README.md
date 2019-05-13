@@ -31,3 +31,27 @@ belongs to.
 
 - [03iris](03iris.ipynb)
 
+## Day 6: cost functions, gradient descent
+
+A common refrain has been to *look at your data*.  Let's look at four
+datasets known as Anscobme's quartet.  This is a chance for us to
+recall some statistics.
+
+- [04anscombe](04anscombe.ipynb)
+
+We've seen a lot of black boxes so far, and it's important for you to
+know what's inside them.  So let's think about *cost functions* and
+how stochastic gradient descent can be used to find minima.
+
+- [05cost](05cost.ipynb)
+
+Your *homework* is to use stochastic gradient descent to attack a
+classic geometric problem.
+
+- [06geometry](06geometry.ipynb)
+
+Let's learn how to use `scikit-learn` to perform stochastic gradient
+descent.  We'll practice using some text data from reddit.
+
+- [07sgd](07sgd.ipynb)
+

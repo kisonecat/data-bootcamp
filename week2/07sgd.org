@@ -1,0 +1,111 @@
+#+TITLE: Stochastic gradient descent
+#+AUTHOR: Jim Fowler
+
+We learn to identify political comments versus science comments.
+
+* Load some text data
+
+One source for text data is reddit.  Download some comments from
+http://files.pushshift.io/reddit/comments/ and use ~bz2~ to decompress
+them.  Here I load a file called ~RC_2010-10.bz2~.  Each line of the
+decompressed file is a JSON object, which can be decoded using
+~json.loads~ in Python after ~import json~.
+
+I load over 250k comments from the "politics" and "science"
+subreddits.
+
+#+BEGIN_SRC ipython 
+import json
+import bz2
+comments = []
+with bz2.open('/home/jim/downloads/RC_2010-10.bz2', 'r') as f:
+    for line in f:
+        comment = json.loads(line.strip())
+        if comment['subreddit'] in ['politics', 'science']:
+            comments.append( comment )
+#+END_SRC
+
+JSON is a popular format, so it behooves us to be comfortable with it.
+
+But ~comment['body']~ is a string of text, so we convert it to a
+vector.
+
+#+BEGIN_SRC ipython 
+from sklearn.feature_extraction.text import HashingVectorizer
+vectorizer = HashingVectorizer(n_features=2**18)
+corpus = [comment['body'] for comment in comments]
+X = vectorizer.fit_transform(corpus)
+#+END_SRC
+
+We want to learn ~y~, the subreddit.
+
+#+BEGIN_SRC ipython 
+import numpy as np
+y = np.array([comment['subreddit'] == 'politics' for comment in comments])
+#+END_SRC
+
+* Evaluating the model
+
+Let's see how well this works.
+
+#+BEGIN_SRC ipython 
+from sklearn.model_selection import train_test_split 
+from sklearn import linear_model
+model = linear_model.SGDClassifier(alpha=1e-05)
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, stratify=y)
+model.fit( X_train, y_train )
+y_pred = model.predict(X_test)
+
+from sklearn.metrics import accuracy_score, f1_score, confusion_matrix
+
+print("Accuracy: {:.2f}%".format(accuracy_score(y_test, y_pred) * 100))
+print("F1 Score: {:.2f}".format(f1_score(y_test, y_pred) * 100))
+print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
+#+END_SRC
+
+* Fitting the final model
+
+When we're happy with our model, we fit it on *all* the data.
+
+#+BEGIN_SRC ipython 
+from sklearn import linear_model
+model = linear_model.SGDClassifier(alpha=1e-05)
+model.fit(X,y)
+#+END_SRC
+
+You may want to save the model for later.  Let's dump it to disk using
+~joblib~, part of scikit-learn.
+
+#+BEGIN_SRC ipython 
+from sklearn.externals import joblib
+_ = joblib.dump(model, "science-versus-politics.model", compress=9)
+#+END_SRC
+
+We can reload it.
+
+#+BEGIN_SRC ipython 
+model = joblib.load("science-versus-politics.model")
+#+END_SRC
+
+And we can use it to classify text.
+
+#+BEGIN_SRC ipython 
+def classify(text):
+    if model.predict(vectorizer.fit_transform([text]))[0]:
+        return 'politics'
+    else:
+        return 'science'
+#+END_SRC
+
+This is probably ~politics~.
+
+#+BEGIN_SRC ipython 
+classify('Who will win the election?')
+#+END_SRC
+
+I hope this is ~science~.
+
+#+BEGIN_SRC ipython 
+classify('Is there any relationship between matter and energy?')
+#+END_SRC
