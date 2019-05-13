@@ -6,10 +6,10 @@ We learn to identify political comments versus science comments.
 * Load some text data
 
 One source for text data is reddit.  Download some comments from
-http://files.pushshift.io/reddit/comments/ and use ~bz2~ to decompress
-them.  Here I load a file called ~RC_2010-10.bz2~.  Each line of the
-decompressed file is a JSON object, which can be decoded using
-~json.loads~ in Python after ~import json~.
+[comments from reddit](http://files.pushshift.io/reddit/comments/) and
+use ~bz2~ to decompress them.  Here, I loaded a large file called
+~RC_2010-10.bz2~.  Each line of the decompressed data is a JSON
+object, which can be decoded using ~json.loads~ in Python.
 
 I load over 250k comments from the "politics" and "science"
 subreddits.
