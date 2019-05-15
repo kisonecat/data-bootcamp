@@ -55,3 +55,22 @@ descent.  We'll practice using some text data from reddit.
 
 - [07sgd](07sgd.ipynb)
 
+## Day 7: logistic regression
+
+We've done some regression (to predict quantities) and classification
+(to predict a label).  But sometimes what we really want is to phrase
+our predictions as *probabilities*.
+
+- [08logistic](08logistic.ipynb)
+
+How do we choose the parameters?
+
+- [09likelihood](09likelihood.ipynb)
+
+What if we want to do more than binary classification?
+
+- [10multiclass](10multiclass.ipynb)
+
+Your homework is to analyze the Titanic.
+
+- [11titanic](11titanic.ipynb)

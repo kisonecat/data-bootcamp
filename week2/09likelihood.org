@@ -1,0 +1,126 @@
+#+TITLE: Likelihood
+#+AUTHOR: Jim Fowler
+
+The *likelihood* is a probability of the joint occurence of the
+observations for specified values of the parameters of the model.  In
+short, it describes how likely we are to see the data assuming a given
+model.
+
+The critical insight is the following: armed with an expression for
+the likelihood, we can choose the model parameters that are most
+plausible given our observations.  Specifically, we obtain the
+parameter estimates by finding the parameter values that maximize the
+likelihood function.
+
+Let's try this in order to perform *logistic regression* (something of
+a misnomer since we're treating it as a classifier!).
+
+* Computing likelihood
+
+We can find an expression for the likelihood.
+
+We have parameters $\beta_1, \ldots, \beta_n$ along with an intercept
+$\beta_0$, and we define $p(x)$ so that $\log \frac{p(x)}{1 - p(x)} = \sum \beta_i x_i +
+\beta_0)$.
+
+Suppose we have $N$ input vectors $x_1, \ldots, x_N$ which are each
+classified with a corresponding $y_i \in \{ 0, 1 \}$.  Then the
+likelihood of making those observations (assuming our model is
+correctly estimating the "actual" probability!) is $\prod_{i=1}^N
+p(x_i)^{y_i} ( 1 - p(x_i) )^{1 - y_i}$.
+
+Instead of maximizing likelihood, we will maximize the log likelihood
+which conveniently replaces the product with a sum.
+
+* Some fake data
+
+#+BEGIN_SRC ipython 
+from sklearn.datasets import make_blobs
+
+N = 100
+points, labels = make_blobs(n_samples=N, centers=2, cluster_std=1, n_features=2)
+#+END_SRC
+
+* The model
+
+In this case, there are there parameters to the model.  We'll call
+them ~bx~ and ~by~ and ~b0~.  Then for a point $(x,y)$ in the plane,
+define $p(x,y) = \sigma( b_x \cdot x + b_y \cdot y + b_0 )$ which is
+the probability that the point $(x,y)$ receives the $1$ label.
+
+#+BEGIN_SRC ipython 
+from scipy.special import expit
+
+def p(x, y, bx, by, b0):
+    return expit( bx * x + by * y + b0 )    
+#+END_SRC
+
+* The cost function
+
+We want to maximize the likelihood, or alternatively minimize the
+negative of the log likelihood.  Let's make our cost function be the
+negative of the log likelihood.
+
+#+BEGIN_SRC ipython 
+def cost(bx, by, b0):
+    result = 0
+    for i in range(N):
+        pp = p( points[i,0], points[i,1], bx, by, b0 )
+        if pp == 1.0 or pp == 0.0:
+            continue
+        if labels[i] == 0:
+            result = result + math.log( 1 - pp )
+        else:
+            result = result + math.log( pp )
+    return -result
+#+END_SRC
+
+* Optimizing
+
+There are a number of solvers in ~scikit-learn~.
+
+A terrible idea is just to randomly try a bunch of things and see how small we can make things.
+
+#+BEGIN_SRC ipython 
+plt.hist( [ cost(*np.random.normal( 0, 2, size=3 )) for _ in range(100)] )
+plt.show()
+#+END_SRC
+
+Let's identify one of those low-cost choices.
+
+#+BEGIN_SRC ipython 
+best = [1,2,3]
+best_cost = cost( *best )
+
+for _ in range(100):
+    b = np.random.normal( 0, 1, size=3 )
+    if cost(*b) < best_cost:
+        best = b
+        best_cost = cost(*best)
+        print(best_cost)
+#+END_SRC
+
+Let's plot it!
+
+#+BEGIN_SRC ipython 
+import matplotlib.pyplot as plt
+
+x_min, x_max = points[:, 0].min() - .5, points[:, 0].max() + .5
+y_min, y_max = points[:, 1].min() - .5, points[:, 1].max() + .5
+h = 0.1
+xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
+
+def predict(point):
+    return p( point[0], point[1], *best) > 0.5
+
+Z = np.array([predict(p) for p in np.c_[xx.ravel(), yy.ravel()]])
+
+Z = Z.reshape(xx.shape)
+plt.figure(1, figsize=(4, 3))
+plt.pcolormesh(xx, yy, Z, cmap=plt.cm.Paired)
+plt.scatter( points[:,0], points[:,1] )
+plt.show()
+#+END_SRC
+
+If you like this sort of thing, you could try using our SGD code to
+attack this problem.

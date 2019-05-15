@@ -1,0 +1,10 @@
+#+TITLE: The sinking of the Titanic
+#+AUTHOR: Jim Fowler
+
+One great source of both data *and* community is Kaggle.
+
+Go to https://www.kaggle.com/c/titanic/data to download data
+describing passengers from the Titanic, and whether or not they
+survived their voyage.  Can you use logistic regression (or any other
+techniques!) to predict who surived?  (Perhaps "predict" is something
+of a misnomer since the Titanic has already sunk!)

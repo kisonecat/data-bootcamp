@@ -1,0 +1,154 @@
+#+TITLE: Multiclass classification
+#+AUTHOR: Jim Fowler
+
+What we've seen so far lets us perform *binary* classification.  What
+if we want to perform classification with three or more classes?
+There are many methods!
+
+**Warning:** ~scikit-learn~ classifiers does multiclass classification
+out-of-the-box.  But pedagogically, we want to make sure we are
+"opening the black boxes" and understanding how these things work.
+
+**Warning 2:** multiclass does not mean multi-label, which is itself
+an incredibly important problem to solve.  A multiclass classification
+problem assigns to an image a single word from among many possible
+words; a multi-label classification problem could assign multiple
+words to each image, which is often important since a picture could
+include multiple things to identify.
+
+* Sample data
+
+Let's generate some fake data to classify.
+
+#+BEGIN_SRC ipython 
+import numpy as np
+
+K = 8 # classes
+N = 35 # in each class
+
+data = []
+
+for i in range(K):
+    x = np.cos(2 * np.pi * i/K)
+    y = np.sin(2 * np.pi * i/K)
+    data.append( np.random.normal( [x,y], 0.1, size=(N,2) ) )
+
+X = np.array( data ).reshape( K*N, 2 )
+y = np.repeat( range(K), N )
+#+END_SRC
+
+Let's see it!
+
+#+BEGIN_SRC ipython 
+import matplotlib.pyplot as plt
+plt.scatter( X[:,0], X[:,1] )
+plt.show()
+#+END_SRC
+
+Can you add color to the plot?
+
+There are many ways of producing fake data with ~scikit-learn~.  For
+instance, we can achieve the above with
+
+#+BEGIN_SRC ipython 
+from sklearn.datasets import make_blobs
+
+K = 8 # classes
+N = 35 # in each class
+angles = np.linspace(0,2*np.pi,K,endpoint=False)
+centers = np.transpose( [np.cos(angles), np.sin(angles)] )
+X, y = make_blobs(n_samples=N*K, centers=centers, cluster_std=0.1, n_features=2)
+#+END_SRC
+
+"Programming" often means understanding not only the "language" and
+its syntax, but also the ecosystem of various packages, libraries,
+etc.  In this case, ~scikit-learn~ offers other ways of producing fake
+data which you should explore for homework.  A classic for binary
+classification is ~make_moons~.
+
+* From binary to multiclass
+
+Again, a **warning:** multinomial logistic regression is a thing.
+Scikit-learn supports multiclass regression without doing any of what
+follows.
+
+This is just for fun and because it is important to open the boxes and
+understand how scikit-learn works its magic.
+
+** One-versus-rest (OvR aka OvA meaning one-versus-all)
+
+For each class $i$, train a single binary classifier for which class
+$i$ is positive and all others are negative.  Then to make a
+prediction on unseen data, apply all the binary classifiers and choose
+the class with the highest probability.
+
+Good languages encourage composition, and Python is no exception.  With ~scikit-learn~, we can feed a binary model to ~OneVsRestClassifier~ to get a classifier that handles more classes.
+
+#+BEGIN_SRC ipython 
+from sklearn.multiclass import OneVsRestClassifier
+from sklearn.svm import SVC
+model = OneVsRestClassifier(SVC(kernel='linear')).fit(X, y)
+#+END_SRC
+
+Let's plot it, and color the background so we can see the *decision
+boundaries*.
+
+#+BEGIN_SRC ipython 
+x_min, x_max = X[:, 0].min() - .5, X[:, 0].max() + .5
+y_min, y_max = X[:, 1].min() - .5, X[:, 1].max() + .5
+h = 0.1
+xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
+
+Z = model.predict(np.c_[xx.ravel(), yy.ravel()])
+
+Z = Z.reshape(xx.shape)
+plt.figure(1, figsize=(4, 3))
+plt.pcolormesh(xx, yy, Z, cmap=plt.cm.Paired)
+plt.scatter( X[:,0], X[:,1] )
+plt.show()
+#+END_SRC
+
+** One-versus-one (OvO)
+
+For $N$ classes, train $\binom{N}{2} = \frac{N(N-1)}{2}$ binary
+classifiers which is trained to distinguish each pair of classes.
+
+To make a prediction, the $\binom{N}{2}$ classifers all vote.  Ties
+are frustrating.
+
+#+BEGIN_SRC ipython 
+from sklearn.multiclass import OneVsOneClassifier
+from sklearn.svm import SVC
+model = OneVsOneClassifier(SVC(kernel='linear')).fit(X, y)
+#+END_SRC
+
+Let's plot it, and color the background so we can see the *decision
+boundaries*.
+
+#+BEGIN_SRC ipython 
+x_min, x_max = X[:, 0].min() - .5, X[:, 0].max() + .5
+y_min, y_max = X[:, 1].min() - .5, X[:, 1].max() + .5
+h = 0.1
+xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
+
+Z = model.predict(np.c_[xx.ravel(), yy.ravel()])
+
+Z = Z.reshape(xx.shape)
+plt.figure(1, figsize=(4, 3))
+plt.pcolormesh(xx, yy, Z, cmap=plt.cm.Paired)
+plt.scatter( X[:,0], X[:,1] )
+plt.show()
+#+END_SRC
+
+* Your Homework
+
+Put another blob in the middle.
+
+#+BEGIN_SRC ipython 
+X = np.vstack( [X, np.random.normal( 0, 0.1, size=(N,2) )] )
+y = np.repeat( range(K+1), N )
+#+END_SRC
+
+Plot this!
+
+Does it still work as well?  Why is it so broken?

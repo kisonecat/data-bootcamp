@@ -1,0 +1,169 @@
+#+TITLE: Logistic regression
+#+AUTHOR: Jim Fowler
+
+We've previously done some regression (to predict quantities) and some
+classification (to predict a label).  But sometimes what we really
+want is to phrase our predictions as *probabilities*.
+
+As usual, each $x$ is is a vector and the corresponding $y \in \{ 0, 1
+\}$ is the desired label.  On an unseen $x$, our model should produce
+a *probability* that the corresponding $y$ is $0$ or $1$.  We write
+$p(x)$ for this model.  In other words, we are building a *stochastic
+model* because the outputs are probabilities rather than a specific
+classification.  We can still produce a classifier from our stochastic
+model: if the model outputs a probability $> 1/2$ then we output $1$,
+and if the model outputs a probability $< 1/2$ then we output $0$.
+
+* The logistic function
+
+For us, "sigmoid function" refers to the logistic function $S$ defined by
+$S(x)={\frac {1}{1+e^{-x}}}={\frac {e^{x}}{e^{x}+1}}$.  
+
+You might define this by
+#+BEGIN_SRC ipython 
+import math
+def S(x):
+    return 1/(1 + math.exp(-x))
+#+END_SRC
+
+Plot it!
+#+BEGIN_SRC ipython 
+import matplotlib.pyplot as plt
+raise Exception("Use matplotlib to plot S")
+#+END_SRC
+
+What is the image of $S$?  You'll be happy computing this.
+#+BEGIN_SRC ipython 
+S(-709)
+#+END_SRC
+
+You'll be sad when you compute this.
+#+BEGIN_SRC ipython 
+S(-710)
+#+END_SRC
+
+What happened?  One solution is the following.
+#+BEGIN_SRC ipython 
+def S(x):
+    if x < 0:
+        return math.exp(x) / (1 + math.exp(x)) 
+    else:
+        return 1 / (1 + math.exp(-x))
+#+END_SRC
+Another choice is to invoke ~scipy~ which provides an ~expit~ function
+defined on arrays.
+
+#+BEGIN_SRC ipython 
+import scipy
+from scipy.special import expit
+
+print(expit(range(-10,10)))
+#+END_SRC
+
+This ~S~ or ~expit~ function is the inverse to the ~logit~ function,
+defined as follows.
+
+#+BEGIN_SRC ipython 
+def logit(p):
+    return math.log( p / (1 - p) )
+#+END_SRC
+
+What's the domain of ~logit~?  Plot it.
+#+BEGIN_SRC ipython 
+import matplotlib.pyplot as plt
+raise Exception("Use matplotlib to plot logit")
+#+END_SRC
+
+You can also find ~logit~ in ~scipy~, and the ~logit~ defined there is
+also valid for arrays.
+
+#+BEGIN_SRC ipython 
+from scipy.special import logit
+#+END_SRC
+
+What happens if you compose ~logit~ and ~expit~?
+
+#+BEGIN_SRC ipython 
+logit(expit(17))
+#+END_SRC
+
+#+BEGIN_SRC ipython 
+expit(logit(0.17))
+#+END_SRC
+
+* The logistic model
+
+Armed with ~logit~ and ~expit~, we relate $\mathbb{R}$ to $\(0,1)$.
+
+If we were to model the probability directly, we might do something
+silly like report probabilities larger than 1 or report negative
+probabilities, but now we can model ~logit~ of the probability, and
+~logit~ is unbounded.  This ~logit~ is said to be the "log odds"
+because it is the logarithm of the odds.  Any real number is a
+reasonable choice for the log odds; if we want the probability, we
+take ~expit~ of the log odds.
+
+Assuming the data is drawn from $\mathbb{R}^n$, our model has
+parameters $\beta_1, \ldots, \beta_n$ along with an intercept
+$\beta_0$, and the model reports $p(x) = S(\sum \beta_i x_i +
+\beta_0)$.  Since $S(0) = 0.5$, the classification problem boils down
+to whether or not $\sum \beta_i x_i + \beta_0$ is positive or negative.
+
+*This is just a model.* Nobody is promising that this is going to fit
+the data all that well, but it provides a way, with $n+1$ parameters,
+to convert $x$'s into a number between $0$ and $1$, which we can
+regard as a probability.  What would it even mean for the logistic
+model to report the "true" probabilities?
+
+* Logistic regression
+
+You should not be surprised that it isn't hard to perform logistic regression with ~scikit-learn~.  Let's load the iris data from your homework.
+
+#+BEGIN_SRC ipython 
+from sklearn.datasets import load_iris
+from sklearn.linear_model import LogisticRegression
+X, y = load_iris(return_X_y=True)
+#+END_SRC
+
+Split the data into a training and a testing set.
+
+#+BEGIN_SRC ipython 
+from sklearn.model_selection import train_test_split 
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, stratify=y)
+#+END_SRC
+
+Train the model.
+
+#+BEGIN_SRC ipython 
+model = LogisticRegression(solver='lbfgs',multi_class='multinomial')
+model.fit(X_train, y_train)
+#+END_SRC
+
+How did it do?
+
+#+BEGIN_SRC ipython 
+from sklearn import metrics
+predicted = model.predict(X_test)
+metrics.classification_report(y_test, predicted)
+print(metrics.confusion_matrix(y_test, predicted))
+#+END_SRC
+
+What do these terms mean?  You might remember (or not remember)
+"sensitivity and specificity" from medical tests.
+
+**Precision** is the ratio of correctly predicted observations (in some
+class) to the total number of observations predicted in the class.
+Think "low false positive."  Or think "out of everyone *predicted* to
+win, how many won?"
+
+**Recall** is the ratio of correctly predicted observations (in some
+class) to the total number of observations labeled as such.  Think
+"out of everyone who won, how many did we predict to win?"
+
+How do these relate to the confusion matrix?  The difference is
+whether we're summing over rows or columns.
+
+Then the **F1 score** is the weighted average of precision and recall.
+It's a weighted average, but remember that you may worry more (or
+less) about false negatives than about false postives.
+
