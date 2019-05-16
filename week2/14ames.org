@@ -1,0 +1,48 @@
+#+TITLE: Ames housing data
+#+AUTHOR: Jim Fowler
+
+* Ames, Iowa
+
+Let's look at housing data.
+
+#+BEGIN_SRC ipython
+import numpy as np
+import pandas as pd
+
+df = pd.read_csv('ames.csv')
+#+END_SRC
+
+Now ~df~ contains information about all residential home sales in
+Ames, Iowa between 2006 and 2010.
+
+Often data will be provided with documentation that describes the
+data.  To learn more about the Ames data set, visit
+
+http://jse.amstat.org/v19n3/decock/DataDocumentation.txt
+
+In this case, the documentation contains some pedagogical notes as
+well which may be of interest.
+
+* Look at the data
+
+How might you use ~pandas~ and ~matplotlib~ to take a first look at
+the data?
+
+Do you see any outliers?
+
+* What is challenging about this data set?
+
+A goal is to predict ~SalePrice~ from the other features.
+
+The challenge is that all these features move together!  Bigger houses
+have more rooms, and probably more features, and ultimately sell for
+more.  This is a case where some *regularization* can help.
+
+* Homework
+
+Use the time today to play around with this data set.
+
+What can you discover?  Make a regression model.
+
+Can you plot the *residual*?
+

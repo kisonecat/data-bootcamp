@@ -1,0 +1,106 @@
+#+TITLE: Regularization
+#+AUTHOR: Jim Fowler
+
+Regularization imposes a penalty on the size of the coefficients in
+the model.
+
+* Sample data
+
+As is our usual process, let's generate some fake data.  This time,
+our target is not classification but regression.
+
+#+BEGIN_SRC ipython 
+import numpy as np
+
+dimension = 25 # should be a perfect square
+N = 1000
+
+y = np.random.normal( 0, 1, size=N )
+
+vs = np.linspace(0.01,2,dimension)
+np.random.shuffle(vs)
+
+xs = []
+for v in vs:
+    xs.append( np.random.normal(0,1) * np.random.normal( y, v ) )
+X = np.array( xs ).transpose()
+#+END_SRC
+
+What does the code above actually achieve?  As always, **look at your
+data**.  (Here we also see how to use ~matplotlib~ to produce a *grid*
+of plots which can be useful.)
+
+#+BEGIN_SRC ipython 
+import matplotlib.pyplot as plt
+
+grid = int(np.sqrt(dimension))
+for i in range(dimension):
+    plt.subplot(grid, grid, 1+i)
+    plt.scatter( y, X[:,i], s=1 )
+plt.show()
+#+END_SRC
+
+We've baked in a great deal of multicollinearity!
+
+This is also an invitation to *high-dimensional data*; our input data
+is 25 dimensional.
+
+* Linear regression
+
+Let's do some linear regression.
+
+#+BEGIN_SRC ipython 
+from sklearn.linear_model import LinearRegression
+model = LinearRegression().fit( X, y )
+#+END_SRC
+
+This works well!
+
+#+BEGIN_SRC ipython 
+model.score(X, y)
+#+END_SRC
+
+But it is arguably upsetting that the model coefficients are involving *all* the features of the data.
+
+#+BEGIN_SRC ipython 
+model.coef_
+#+END_SRC
+
+From the plot, we can see that we can explain ~y~ by looking just at
+*one* feature of the data.
+
+* Lasso
+
+Our usual linear regression involves the cost function
+$||X w - y||_2^2$.
+
+For "lasso" we instead minimize the cost function
+
+${ \frac{1}{2n}} ||X w - y||_2 ^ 2 + \alpha ||w||_1}$.
+
+Here $\alpha$ is the regularization parameter, and $||w||_1$ is the
+sum of the coefficients of the model.  By adding this term to the cost
+function, we are effectively penalizing the model based on the size of
+the coefficients.
+
+#+BEGIN_SRC ipython 
+from sklearn.linear_model import Lasso
+model = Lasso().fit( X, y )
+#+END_SRC
+
+Does this really change the coeffiicients at all?
+
+#+BEGIN_SRC ipython 
+model.coef_
+#+END_SRC
+
+Consider how important this could be, because not only does this make
+the model "simpler" (perhaps avoiding overfitting?) but it also makes
+the model more *explainable* in that we are identifying the key pieces
+of the input that explain the output.
+
+A part of data science involves creating models that you can actually
+"sell" in that someone else (who might know nothing of data) will
+believe the patterns you've discovered.  As first noted by Hamming,
+the purpose of computing is not numbers but *insight*.
+

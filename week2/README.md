@@ -74,3 +74,39 @@ What if we want to do more than binary classification?
 Your homework is to analyze the Titanic.
 
 - [11titanic](11titanic.ipynb)
+
+## Day 8: overfitting and regularization
+
+Regularization imposes a penalty on the size of the coefficients in
+the model.
+
+- [12regularization](12regularization.ipynb)
+
+One application of regularization is to avoid overfitting.
+
+- [13overfitting](13overfitting.ipynb)
+
+Your homework is more significant: take a look at house prices in
+Ames, Iowa and attempt to predict sale price from house features.
+
+- [14ames](14ames.ipynb)
+
+This serves as an opportunity to consolidate your learning from Week
+1: make sure you know how to look at data `pandas`, make plots to find
+some outliers, remove them ("subsetting"), etc.
+
+# Reflect on Week 2
+
+You can now do some machine learning!  For example, you can take some
+labeled training data and predict the labels on the testing set.
+
+Take some time to think about the broader workflow of a "data
+scientist."  In [Week 1](../week1/README.md), we learned how to load
+packages and load data, and how to "wrangle" the data into data frames
+(with `pandas`), perform some subsetting, get a quick look with
+`df.describe()` and make some initial scatterplots with `matplotlib`.
+That sort of exploration can help with cleaning the data.
+
+Having finished Week 2, you've got the data ready to go and you now
+know how to train and test a model.  This is an excellent step on your
+way to becoming a data scientist!

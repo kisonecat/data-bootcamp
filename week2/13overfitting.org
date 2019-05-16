@@ -1,0 +1,109 @@
+#+TITLE: Overfitting
+#+AUTHOR: Jim Fowler
+
+We've seen some overfitting before.  Now we have a potential solution:
+regularization.
+
+* Training and testing to detect overfitting
+
+Let's produce some more fake data.
+
+#+BEGIN_SRC ipython
+import numpy as np
+
+N = 25
+X = np.random.uniform(0,np.pi,N)
+y = np.sin(X) + np.random.normal(0,0.1,N)
+#+END_SRC
+
+Plot it!
+
+#+BEGIN_SRC ipython
+import matplotlib.pyplot as plt
+plt.scatter(X,y)
+plt.show()
+#+END_SRC
+
+Replace each entry $x$ in ~X~ with powers of $x$.
+
+#+BEGIN_SRC ipython
+from sklearn.preprocessing import PolynomialFeatures
+polynomial_features= PolynomialFeatures(degree=10)
+X_poly = polynomial_features.fit_transform(X.reshape(N,-1))
+#+END_SRC
+
+We split this into a training and a testing set.
+
+#+BEGIN_SRC ipython
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X_poly, y, test_size = 0.3)
+#+END_SRC
+
+We fit a model using the training data.
+
+#+BEGIN_SRC ipython
+from sklearn.linear_model import LinearRegression
+model = LinearRegression().fit( X_train, y_train )
+#+END_SRC
+
+It fits well on the training data!
+
+#+BEGIN_SRC ipython
+model.score( X_train, y_train )
+#+END_SRC
+
+Not so well on the testing set.
+
+#+BEGIN_SRC ipython
+model.score( X_test, y_test )
+#+END_SRC
+
+* Regularization ftw
+
+Perhaps unsurprisingly, when fitting a high-degree polynomial, we're
+overfitting.
+
+Regularization is helpful here.
+
+Our usual linear regression involves the cost function $||X w -
+y||_2^2$.  But for "ridge regression" we instead minimize the cost
+function
+
+${ \frac{1}{2n}} ||X w - y||_2^2 + \alpha ||w||_2^2}$.
+
+#+BEGIN_SRC ipython 
+from sklearn.linear_model import Ridge
+model = Ridge().fit( X_train, y_train )
+#+END_SRC
+
+It does worse on the training data.
+
+#+BEGIN_SRC ipython
+model.score( X_train, y_train )
+#+END_SRC
+
+But better on the testing set.
+
+#+BEGIN_SRC ipython
+model.score( X_test, y_test )
+#+END_SRC
+
+* Choosing alpha
+
+Let's see how the fit depends on the choice of $\alpha$.
+
+#+BEGIN_SRC ipython
+from sklearn.linear_model import Ridge
+
+alphas = np.linspace(0.00001,1,100)
+scores = []
+for alpha in alphas:
+    model = Ridge(alpha=alpha).fit( X_train, y_train )
+    scores.append( model.score( X_test, y_test ) )
+
+plt.scatter( alphas, scores )
+plt.show()
+#+END_SRC
+
+Does ~Lasso~ work as well?
+
