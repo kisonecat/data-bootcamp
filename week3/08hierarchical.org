@@ -1,0 +1,96 @@
+#+TITLE: Agglomerative hierarchical clustering
+#+AUTHOR: Jim Fowler
+
+By "agglomerative" we mean a clustering technique in which we initially start with individual data points as the "clusters" and over time we "agglomerate" these small clusters into larger clusters.
+
+There is the opposite strategy, i.e., that is divisive clustering
+which begins with a single giant cluster and splits it.
+
+* Some real data
+
+By now surely you're getting tired of this iris data set?
+
+#+BEGIN_SRC ipython 
+from sklearn.datasets import load_iris
+X, y = load_iris(return_X_y=True)
+#+END_SRC
+
+* Draw a dendrogram
+
+Like so many things ~scikit-learn~ makes drawing a dendrogram quite easy.
+
+#+BEGIN_SRC ipython 
+from matplotlib import pyplot as plt
+from scipy.cluster.hierarchy import dendrogram, linkage  
+
+linked = linkage(X)
+dendrogram(linked, labels=y)
+plt.show()  
+#+END_SRC
+
+And like so many things, ~scikit-learn~ offers many parameters which
+greatly modify the output.
+
+#+BEGIN_SRC ipython 
+linked = linkage(X, 'ward')
+dendrogram(linked, labels=y, leaf_rotation=0,leaf_font_size=6)
+plt.show()  
+#+END_SRC
+
+* Perform agglomerative clustering
+
+#+BEGIN_SRC ipython 
+from sklearn.cluster import AgglomerativeClustering
+ac = AgglomerativeClustering(n_clusters=3)
+ac.fit(X)
+ac.labels_
+#+END_SRC
+
+How did we do?
+
+#+BEGIN_SRC ipython 
+from sklearn.metrics import adjusted_rand_score
+adjusted_rand_score(y, ac.labels_)
+#+END_SRC
+
+#+BEGIN_SRC ipython 
+from sklearn.metrics import confusion_matrix
+confusion_matrix( y, ac.labels_ )
+#+END_SRC
+
+Let's **look at our data**.
+
+#+BEGIN_SRC ipython 
+import matplotlib.pyplot as plt
+plt.scatter( X[:,1], X[:,2],c=y )
+for i, label in enumerate(ac.labels_):
+    plt.annotate(label, (X[i,1], X[i,2]))
+plt.show()
+#+END_SRC
+
+* Is this really better than k-means?
+
+Let's do some k-means!
+
+#+BEGIN_SRC ipython 
+from sklearn.cluster import KMeans
+kmeans = KMeans(n_clusters=3).fit(X)
+kmeans.labels_
+#+END_SRC
+
+We could judge this via some metrics.
+
+#+BEGIN_SRC ipython 
+from sklearn.metrics import adjusted_rand_score
+adjusted_rand_score(y, kmeans.labels_)
+#+END_SRC
+
+But we could also just look at some pictures.
+
+#+BEGIN_SRC ipython 
+import matplotlib.pyplot as plt
+plt.scatter( X[:,1], X[:,2],c=y )
+for i, label in enumerate(kmeans.labels_):
+    plt.annotate(label, (X[i,1], X[i,2]))
+plt.show()
+#+END_SRC

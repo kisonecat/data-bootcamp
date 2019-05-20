@@ -1,0 +1,127 @@
+#+TITLE: Dendrograms
+#+AUTHOR: Jim Fowler
+
+* Financial data
+
+Let's *again* load some stock prices.
+
+#+BEGIN_SRC ipython
+import os, json
+files = [f for f in os.listdir('week3/stocks') if f.endswith('.json')]
+
+data = {}
+symbols = []
+for name in files:
+    with open(os.path.join('week3/stocks/', name),'r') as f:
+        d = json.load(f)
+        symbol = d['Meta Data']['2. Symbol']
+        symbols.append( symbol )
+        data[ symbol ] = d['Time Series (Daily)']
+#+END_SRC
+
+Convert it to a ~pandas~ data frame, and then to a ~numpy~ array called ~X~.
+
+#+BEGIN_SRC ipython
+import pandas as pd
+
+market = pd.DataFrame(columns=['date'])
+
+for symbol in data.keys():
+    dates = pd.DataFrame( pd.to_datetime( list(data[symbol].keys()) ), columns=['date'] )
+    closes = pd.DataFrame( [float(x['5. adjusted close']) for x in data[symbol].values()], columns=[symbol] )
+    df = pd.DataFrame( pd.concat( [dates, closes], axis=1 ) )
+    market = market.merge( df, how='outer' )
+
+import numpy as np
+prices = market.drop('date',axis=1)
+symbols = list(prices.columns)
+X = np.array([prices[s] for s in symbols])
+#+END_SRC
+
+** Make a plot
+
+#+BEGIN_SRC ipython 
+from matplotlib import pyplot as plt
+from scipy.cluster.hierarchy import dendrogram, linkage  
+
+linked = linkage(X, 'complete', metric='cosine')
+dendrogram(linked, labels=symbols)
+plt.show()
+#+END_SRC
+
+* The works of Shakespeare
+
+#+BEGIN_SRC ipython
+works = ["A LOVER’S COMPLAINT",
+"A MIDSUMMER NIGHT’S DREAM",
+"ALL’S WELL THAT ENDS WELL",
+"AS YOU LIKE IT",
+"CYMBELINE",
+"KING HENRY THE EIGHTH",
+"KING JOHN",
+"KING RICHARD THE SECOND",
+"KING RICHARD THE THIRD",
+"LOVE’S LABOUR’S LOST",
+"MEASURE FOR MEASURE",
+"MUCH ADO ABOUT NOTHING",
+"PERICLES, PRINCE OF TYRE",
+"THE COMEDY OF ERRORS",
+"THE FIRST PART OF HENRY THE SIXTH",
+"THE FIRST PART OF KING HENRY THE FOURTH",
+"THE HISTORY OF TROILUS AND CRESSIDA",
+"THE LIFE OF KING HENRY THE FIFTH",
+"THE LIFE OF TIMON OF ATHENS",
+"THE MERCHANT OF VENICE",
+"THE MERRY WIVES OF WINDSOR",
+"THE PASSIONATE PILGRIM",
+"THE PHOENIX AND THE TURTLE",
+"THE RAPE OF LUCRECE",
+"THE SECOND PART OF KING HENRY THE FOURTH",
+"THE SECOND PART OF KING HENRY THE SIXTH",
+"THE TAMING OF THE SHREW",
+"THE TEMPEST",
+"THE THIRD PART OF KING HENRY THE SIXTH",
+"THE TRAGEDY OF ANTONY AND CLEOPATRA",
+"THE TRAGEDY OF CORIOLANUS",
+"THE TRAGEDY OF HAMLET, PRINCE OF DENMARK",
+"THE TRAGEDY OF JULIUS CAESAR",
+"THE TRAGEDY OF KING LEAR",
+"THE TRAGEDY OF MACBETH",
+"THE TRAGEDY OF OTHELLO, MOOR OF VENICE",
+"THE TRAGEDY OF ROMEO AND JULIET",
+"THE TRAGEDY OF TITUS ANDRONICUS",
+"THE TWO GENTLEMEN OF VERONA",
+"THE TWO NOBLE KINSMEN",
+"THE WINTER’S TALE",
+"TWELFTH NIGHT; OR, WHAT YOU WILL",
+"VENUS AND ADONIS"]
+
+from urllib.request import urlopen
+
+corpus = {}
+current = []
+for line in urlopen('http://www.gutenberg.org/files/100/100-0.txt'):
+    line = line.decode('utf-8')
+    if line.strip() in works:
+        current = corpus[line.strip()] = []
+    current.append( line )
+
+for work in works:
+    corpus[work] = ''.join(corpus[work])
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+vectorizer = TfidfVectorizer(stop_words = 'english')
+X = vectorizer.fit_transform( [corpus[w] for w in works] )
+#+END_SRC
+
+** Make a plot
+
+#+BEGIN_SRC ipython 
+from matplotlib import pyplot as plt
+from scipy.cluster.hierarchy import dendrogram, linkage  
+
+from sklearn.metrics.pairwise import cosine_similarity
+linked = linkage(1 - cosine_similarity(X,X))
+dendrogram(linked, labels=works)
+plt.show()
+#+END_SRC

@@ -1,0 +1,56 @@
+#+TITLE: DBSCAN
+#+AUTHOR: Jim Fowler
+
+We've already seen k-means, and let me emphasize how great k-means
+was: simple to describe, quick to run.
+
+It doesn't always work, however.
+
+* Some fake data
+
+#+BEGIN_SRC ipython 
+import numpy as np
+count = 1000
+angles = np.random.uniform( 0, 2*np.pi, count )
+ring = np.array([np.sin( angles ), np.cos( angles )]) * np.random.uniform(2,3,count)
+ring = ring.transpose()
+blob = np.random.normal(0,0.3,size=(count,2))
+
+y = np.repeat([0,1],count)
+X = np.vstack( [ring,blob] )
+#+END_SRC
+
+Let's **look at our data**.
+
+#+BEGIN_SRC ipython 
+import matplotlib.pyplot as plt
+plt.scatter( X[:,0], X[:,1],c=y )
+plt.show()
+#+END_SRC
+
+* Why is k-means broken here?
+
+Let's try k-means.
+
+#+BEGIN_SRC ipython 
+from sklearn.cluster import KMeans
+kmeans = KMeans(n_clusters=2).fit(X)
+kmeans.labels_
+plt.scatter( X[:,0], X[:,1],c=kmeans.labels_ )
+plt.show()
+#+END_SRC
+
+That did not work.
+
+* DBSCAN ftw
+
+DBSCAN is a popular clustering algorithm which won't fall victim to
+that trap.
+
+#+BEGIN_SRC ipython 
+from sklearn.cluster import DBSCAN
+dbscan = DBSCAN().fit(X)
+dbscan.labels_
+plt.scatter( X[:,0], X[:,1],c=dbscan.labels_ )
+plt.show()
+#+END_SRC
