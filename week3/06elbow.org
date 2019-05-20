@@ -1,0 +1,52 @@
+#+TITLE: The elbow method
+#+AUTHOR: Jim Fowler
+
+With ~KMeans~ we still need to choose a number ~n_clusters~ of clusters.
+
+How do we pick this?
+
+The basic idea is that we pick ~n_clusters~ so that a larger value of
+~n_clusters~ wouldn't provide a substantively *better* model of the
+data.  To make this precise, we need to clarify what *better* means.
+
+* Some real data
+
+Again, let's load the iris data.
+
+#+BEGIN_SRC ipython 
+from sklearn.datasets import load_iris
+X, y = load_iris(return_X_y=True)
+#+END_SRC
+
+Here we *know* labels ~y~ and we know that there are supposed to be
+three species of iris.  Is this supported by the data?
+
+#+BEGIN_SRC ipython 
+kmeans = KMeans(n_clusters=3).fit(X)
+kmeans.inertia_
+#+END_SRC
+
+What is ~inertia~?  This is the "within-cluster sum-of-squares."
+Ultimately, with ~KMeans~ this is what we are hoping to minimize by
+partitioning the data into the clusters.
+
+Let's plot this within-cluster sum-of-squares for the clusters computed via ~KMeans~ for multiple choices of ~n_clusters~.
+
+#+BEGIN_SRC ipython 
+import matplotlib.pyplot as plt
+plt.plot( [KMeans(n_clusters=n).fit(X).inertia_ for n in range(1,10)] )
+plt.show()
+#+END_SRC
+
+In the graph, we look for an "elbow" where an additional cluster
+wouldn't help much.  (These "elbows" are a common theme in data
+science: after all, we want models complex enough to capture the
+regularities in the data, but not *too* complex to suffer from
+overfitting.)
+
+* Your homework
+
+Do this "elbow analysis" on the MNIST data.
+
+If more than 10 clusters is warranted, can you describe what these
+additional clusters are?

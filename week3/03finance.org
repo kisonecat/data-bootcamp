@@ -1,0 +1,97 @@
+#+TITLE: Finance data
+#+AUTHOR: Jim Fowler
+
+Another source for high-dimensional data comes from finance.
+
+* Load real world data
+
+Let's load some stock prices.
+
+#+BEGIN_SRC ipython
+import os, json
+files = [f for f in os.listdir('week3/stocks') if f.endswith('.json')]
+
+data = {}
+symbols = []
+for name in files:
+    with open(os.path.join('week3/stocks/', name),'r') as f:
+        d = json.load(f)
+        symbol = d['Meta Data']['2. Symbol']
+        symbols.append( symbol )
+        data[ symbol ] = d['Time Series (Daily)']
+#+END_SRC
+
+Convert it to a ~pandas~ data frame.
+
+#+BEGIN_SRC ipython
+import pandas as pd
+
+market = pd.DataFrame(columns=['date'])
+
+for symbol in data.keys():
+    dates = pd.DataFrame( pd.to_datetime( list(data[symbol].keys()) ), columns=['date'] )
+    closes = pd.DataFrame( [float(x['5. adjusted close']) for x in data[symbol].values()], columns=[symbol] )
+    df = pd.DataFrame( pd.concat( [dates, closes], axis=1 ) )
+    market = market.merge( df, how='outer' )
+#+END_SRC
+
+* Make a plot
+
+Let's "wrangle" this data into our desired format.
+
+#+BEGIN_SRC ipython
+import numpy as np
+prices = market.drop('date',axis=1)
+symbols = list(prices.columns)
+X = np.array([prices[s] for s in symbols])
+#+END_SRC
+
+This is much too high-dimensional for us to plot.  Let's do some
+unsupervised dimensionality reduction.  Let's first normalize
+everything.
+
+#+BEGIN_SRC ipython
+from sklearn.preprocessing import StandardScaler
+ss = StandardScaler()
+ss.fit(X.transpose())
+X2 = ss.transform(X.transpose())
+X2 = X2.transpose()
+#+END_SRC
+
+Then we'll perform PCA.
+
+#+BEGIN_SRC ipython
+from sklearn.decomposition import PCA
+pca = PCA(n_components=2)
+pca.fit(X2)  
+X3 = pca.transform(X2)
+#+END_SRC
+
+Plot it!
+
+#+BEGIN_SRC ipython
+import matplotlib.pyplot as plt
+plt.scatter( X3[:,0], X3[:,1] )
+for i, w in enumerate(symbols):
+    plt.text( X3[i,0], X3[i,1], w )
+plt.show()
+#+END_SRC
+
+It looks Facebook and Apple are similar.
+
+#+BEGIN_SRC ipython
+import matplotlib.pyplot as plt
+plt.scatter( prices['FB'], prices['AAPL'] )
+plt.show()
+#+END_SRC
+
+Compare Toyota to Google.
+
+#+BEGIN_SRC ipython
+import matplotlib.pyplot as plt
+plt.scatter( prices['TM'], prices['GOOG'] )
+plt.show()
+#+END_SRC
+
+Dig further into this data.
+

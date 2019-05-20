@@ -70,17 +70,22 @@ to you personally.  We've prepared [a list of places to find
 data](DATA.md) if you're having trouble finding a data set to play
 with.
 
-As always, the first step is to **look at your data** but your chosen
-data might be high-dimensional or otherwise hard to explore.  So this
-week we consider clustering algorithms (k-means, and hierarchical
-clustering) and we use some linear algebra (e.g., singular value
-decomposition) to reduce the dimension of our data.
+The first step is to **look at your data** but your chosen data might
+be high-dimensional or otherwise hard to explore.  So this week we
+consider clustering algorithms (k-means, and hierarchical clustering)
+and we use some linear algebra (e.g., singular value decomposition) to
+reduce the dimension of our data.
 
 - Day 9: high-dimensional data, correlation
 - Day 10: k-means
 - Day 11: hierarchical clustering
 - Day 12: linear algebra
 
-**By the end of [Week 3](week3/README.md)** you will be prepared to find a (potentially
-high-dimensional!) data set you are interested in, find some insights
-in your data, and present evidence supporting your hypothesis.
+I also want to make sure that you are comfortable with the
+command-line, an editor, and can run Python code from `.py` files.  A
+little practice with Unix will go a long way!
+
+**By the end of [Week 3](week3/README.md)** you will be prepared to
+find a (potentially high-dimensional!) data set you are interested in,
+find some insights in your data, and present evidence supporting your
+hypothesis.

@@ -1,0 +1,109 @@
+#+TITLE: k-means
+#+AUTHOR: Jim Fowler
+
+A danger of ~scikit-learn~ is, with all its black boxes, we'll simply use the boxes without ever peeking inside and understanding how things work.  Let's peek inside ~KMeans~ by reimplementing this with ~numpy~.
+
+#+BEGIN_SRC ipython 
+import numpy as np
+#+END_SRC
+
+* Recall how we used KMeans
+
+We produce some random data.
+
+#+BEGIN_SRC ipython 
+from sklearn.datasets import make_blobs
+K = 2 # classes
+N = 100 # in each class
+dimension = 2
+X, y = make_blobs(n_samples=N*K, centers=K, n_features=dimension)
+#+END_SRC
+
+Now we can apply ~KMeans~.
+
+#+BEGIN_SRC ipython 
+from sklearn.cluster import KMeans
+kmeans = KMeans(n_clusters=K).fit(X)
+kmeans.labels_
+#+END_SRC
+
+* Cluster centers
+
+More than ~labels_~ we also get ~cluster_centers_~.
+
+#+BEGIN_SRC ipython 
+kmeans.cluster_centers_
+#+END_SRC
+
+Let's plot those centers.
+
+#+BEGIN_SRC ipython 
+import matplotlib.pyplot as plt
+plt.scatter(X[:,0], X[:,1])
+plt.scatter(kmeans.cluster_centers_[:,0], kmeans.cluster_centers_[:,1], c='r',s=200)
+plt.show()
+#+END_SRC
+
+* How does this work?
+
+So how does ~KMeans~ work?  First we initialize (randomly?) centers
+for our clusters.
+
+Then we start looping.  What do we do during each iteration?  
+
+For each point, we assign to each point the cluster center nearest to
+it; then we move the cluster centers to the average location of the
+points assigned to it (hence k-*means*).  We could play the same game
+with medians (and produce the so-called "k-medians" algorithm).
+
+* Let's implement it!
+
+We randomly choose centers.  One way to do this is to randomly choose
+data from the data set; this is the "Forgy method."
+
+#+BEGIN_SRC ipython 
+cluster_centers = X[np.random.choice(len(X),size=K)]
+#+END_SRC
+
+For each point, we figure out which cluster center is nearest to it.
+
+#+BEGIN_SRC ipython 
+def closest(X, cluster_centers):
+    distances = np.linalg.norm((X - cluster_centers[:, np.newaxis]), axis=2)
+    return np.argmin(distances, axis=0)
+#+END_SRC
+
+Now we find the new centers.
+
+#+BEGIN_SRC ipython 
+def new_centers(X, cluster_centers):
+    c = closest(X, cluster_centers)
+    return np.array([X[c==k].mean(axis=0) for k in range(K)])
+#+END_SRC
+
+Now we can set up the algorithm.
+
+#+BEGIN_SRC ipython 
+def my_kmeans(X):
+    cluster_centers = X[np.random.choice(len(X),size=K)]
+    while True:
+        moved = new_centers(X, cluster_centers)
+        if np.linalg.norm( moved - cluster_centers ) < 0.001:
+             return cluster_centers
+        cluster_centers = moved
+
+my_kmeans(X)
+#+END_SRC
+
+Is this really what ~scikit-learn~ is doing?
+
+#+BEGIN_SRC ipython 
+kmeans.cluster_centers_
+#+END_SRC
+
+* Homework
+
+Use ~numpy~ to produce a random dataset which consists of a
+ring-shaped region around a blob.
+
+Do you expect k-means will be able to identify such clusters?

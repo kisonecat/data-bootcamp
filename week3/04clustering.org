@@ -1,0 +1,145 @@
+#+TITLE: Clustering
+#+AUTHOR: Jim Fowler
+
+When we do *unsupervised learning* we wish to draw inferences from
+datasets which consist of input data *without* pre-assigned labels or
+targets.  This is important in part when we're initially exploring the
+data (performing so-called "exploratory data analysis") and we may not
+have a good sense for how the data is distributed.
+
+* Clustering
+
+Clustering of unlabeled data can be performed with ~sklearn.cluster~.
+Just as ~scikit-learn~ provides us with a common framework for
+building models, it also provides a common framework here.
+
+Each clustering method includes a class implementing ~fit~ to learn
+the clusters.  Then you can inspect ~labels_~ to get the learned
+labels.
+
+* Some fake data
+
+Unsurprisingly, let's produce some fake data.
+
+#+BEGIN_SRC ipython 
+import numpy as np
+from sklearn.datasets import make_blobs
+
+K = 2 # classes
+N = 100 # in each class
+X, y = make_blobs(n_samples=N*K, centers=K, n_features=2)
+#+END_SRC
+
+Here we know the truth: the labels are in ~y~.  Can we recover these
+labels by using ~scikit-learn~?  We don't yet know what ~KMeans~ is,
+but everything in ~sklearn.cluster~ has a ~fit~ after which you can
+inspect ~labels_~, so let's do that.
+
+#+BEGIN_SRC ipython 
+from sklearn.cluster import KMeans
+kmeans = KMeans(n_clusters=2).fit(X)
+kmeans.labels_
+#+END_SRC
+
+How did we do?
+
+#+BEGIN_SRC ipython 
+from sklearn.metrics import confusion_matrix
+confusion_matrix( y, kmeans.labels_ )
+#+END_SRC
+
+Note that we had to tell ~KMeans~ the *desired* number of clusters
+~n_clusters~.  What if we chose the wrong number of clusters?
+
+#+BEGIN_SRC ipython 
+kmeans = KMeans(n_clusters=5).fit(X)
+confusion_matrix( y, kmeans.labels_ )
+#+END_SRC
+
+* Return of the iris
+
+Let's load that iris data again.
+
+#+BEGIN_SRC ipython 
+from sklearn.datasets import load_iris
+X, y = load_iris(return_X_y=True)
+#+END_SRC
+
+Of course this is *labeled* data, but again we can see how well we might be able to recover the clusters if someone hadn't told us ~y~.
+
+#+BEGIN_SRC ipython 
+kmeans = KMeans(n_clusters=3).fit(X)
+confusion_matrix( y, kmeans.labels_ )
+#+END_SRC
+
+We can plot the ground truth.
+
+#+BEGIN_SRC ipython 
+import matplotlib.pyplot as plt
+plt.scatter( X[:,1], X[:,2],c=y)
+plt.show()
+#+END_SRC
+
+We can plot what ~scikit-learn~ found as the labels.
+
+#+BEGIN_SRC ipython 
+import matplotlib.pyplot as plt
+plt.scatter( X[:,1], X[:,2],c=kmeans.labels_)
+plt.show()
+#+END_SRC
+
+Where do they differ?  Where do these match?
+
+#+BEGIN_SRC ipython 
+import matplotlib.pyplot as plt
+plt.scatter( X[:,1], X[:,2],c=kmeans.labels_ == y) ; plt.show()
+#+END_SRC
+
+* MNIST digits
+
+Let's load the MNIST digits.
+
+#+BEGIN_SRC ipython 
+from sklearn.datasets import load_digits
+X,y = load_digits(return_X_y=True)
+#+END_SRC
+
+Let's cluster.
+
+#+BEGIN_SRC ipython 
+kmeans = KMeans(n_clusters=3).fit(X)
+confusion_matrix( y, kmeans.labels_ )
+#+END_SRC
+
+That's definitely the wrong number of clusters.
+
+#+BEGIN_SRC ipython 
+kmeans = KMeans(n_clusters=10).fit(X)
+confusion_matrix( y, kmeans.labels_ )
+#+END_SRC
+
+The ~confusion_matrix~ isn't really the right thing here: the labels
+learned via unsupervised learning, at the very least, could be
+permuted without being wrong.  When the ground truth (namely ~y~) is
+known, there are a variety of metrics that one can use.
+
+#+BEGIN_SRC ipython 
+from sklearn.metrics import adjusted_rand_score
+adjusted_rand_score(y, kmeans.labels_)
+#+END_SRC
+
+As always, it helps if we can **look at the data**.
+	
+#+BEGIN_SRC ipython 
+digit = 7
+images = X[kmeans.labels_ == digit]
+
+fig, axes = plt.subplots(10,10)
+
+for i in range(10):
+    for j in range(10):
+        axes[i,j].axis('off')
+        axes[i,j].imshow(images[i * 10 + j].reshape(8,8))
+
+plt.show()
+#+END_SRC
