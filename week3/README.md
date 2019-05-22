@@ -58,7 +58,7 @@ But with k-means, we need to know how many clusters to choose.  The
 # Day 11: hierarchical clustering
 
 There are some situations where k-means fails badly.  Although
-~scikit-learn~ enables you to carry out a great many algorithms and
+`scikit-learn` enables you to carry out a great many algorithms and
 procedures from data science, it is nevertheless useful to actually
 *understand how these algorithms work* because such understanding
 provides insight into why a particular procedure might fail (or
@@ -80,3 +80,29 @@ available, like dendrograms.
 
 We wll continue to discuss how to edit code, how to execute your
 Python scripts, etc.
+
+# Day 12: linear algebra
+
+A continuing theme for the week is how to handle high-dimensional
+data.
+
+- [10lsa](10lsa.ipynb)
+
+Another example of high-dimensional data are images, like faces.
+
+- [11faces](11faces.ipynb)
+
+To make precise what we've been doing, let's finally dig into SVD.
+
+- [12svd](12svd.ipynb)
+
+There's so much more to say.  I personally find *word embeddings* to
+be very fun: take a look at `word2vec` for more on this.
+
+# Reflect on Week 3
+
+We have reached the end of our time together.
+
+You are ready to find a (potentially high-dimensional!) data set you
+are interested in, uncover some insights in your data, and present
+evidence supporting your hypothesis.

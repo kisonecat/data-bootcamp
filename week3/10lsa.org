@@ -1,0 +1,69 @@
+#+TITLE: latent semantic analysis
+#+AUTHOR: Jim Fowler
+
+I should mention that this technique (latent semantic analysis,
+otherwise known as LSA) is related to principal component analysis
+(PCA).  Matt Osborne will be presenting much more on PCA during a
+special session.
+
+* Load some real-world data
+
+Let's see how this might work by reprising our reddit data set.
+
+#+BEGIN_SRC ipython 
+import json
+import bz2
+comments = []
+with bz2.open('/home/jim/downloads/RC_2010-10.bz2', 'r') as f:
+    for line in f:
+        comment = json.loads(line.strip().decode('utf-8'))
+        if comment['subreddit'] == 'politics':
+            if comment['body'] != '[deleted]':
+                comments.append( comment )
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+vectorizer = TfidfVectorizer()
+corpus = [comment['body'] for comment in comments]
+X = vectorizer.fit_transform(corpus)
+#+END_SRC
+
+At this point ~X~ is rows of vectors for each "document" which in this
+case is a reddit comment.
+
+* Reduce dimension
+
+#+BEGIN_SRC ipython 
+from sklearn.decomposition import  TruncatedSVD
+tsvd = TruncatedSVD(n_components=300)
+tsvd.fit(X)  
+X2 = tsvd.transform(X)
+#+END_SRC
+
+You might enjoy changing ~n_components~.  In this case, ~300~ is a
+"recommended number."
+
+* Then cluster
+
+Why is it reasonable (or a good idea) to first perform SVD before
+clustering?
+
+#+BEGIN_SRC ipython 
+from sklearn.cluster import KMeans
+kmeans = KMeans(n_clusters=10).fit(X2)
+kmeans.labels_
+#+END_SRC
+
+* Explore the clusters
+
+#+BEGIN_SRC ipython 
+for j in np.unique(kmeans.labels_):
+    print("****************************************************************")
+    print("Cluster",j)
+    for i in np.random.choice( np.nonzero(kmeans.labels_ == j)[0], size=20, replace=False ):
+        print(corpus[i][0:70])
+#+END_SRC
+
+* Homework
+
+Given a document, find (and print) documents which are nearby in the
+"semantic space" computed by SVD.

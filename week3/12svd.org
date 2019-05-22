@@ -1,0 +1,170 @@
+#+TITLE: Singular-Value Decomposition
+#+AUTHOR: Jim Fowler
+
+* Computing SVD with numpy
+
+Let's pick a matrix at random.
+
+#+BEGIN_SRC ipython 
+import numpy as np
+m = 6
+n = 5
+A = np.random.normal(0,1,size=(m,n))
+#+END_SRC
+
+Note that $A$ is *not* square, so ~np.linalg.eigvals~ fails.
+
+#+BEGIN_SRC ipython 
+np.linalg.eigvals(A)
+#+END_SRC
+
+Nevertheless, we can compute the singular-value decomposition, usually
+known by the acronym SVD.
+
+#+BEGIN_SRC ipython 
+U, s, V = np.linalg.svd(A)
+#+END_SRC
+
+Now $A$ is $m \times n$, or in ~numpy~'s syntax, ~A.shape == (m,n)~.
+
+Then $U$ is $m \times m$, and $s$ has length $\mathrm{min}(m,n)$, and
+$V$ is $n \times n$.  Let's check this.
+
+#+BEGIN_SRC ipython 
+U.shape == (m,m) and len(s) == min(m,n) and V.shape == (n,n)
+#+END_SRC
+
+The numbers in ~s~ are the *singular values* of $A$.  The columns of
+$U$ are the *left-singular vectors* and the columns of $V$ are the
+*right-singular vectors* of $A$.
+
+* SVD is a matrix factorization
+
+There are many "matrix factorizations" in the world.  SVD is such a
+factorization.  Let's see this in some specific case.
+
+#+BEGIN_SRC ipython 
+import numpy as np
+m = 6
+n = 5
+A = np.random.normal(0,1,size=(m,n))
+
+U, s, V = np.linalg.svd(A)
+
+S = np.zeros( (m, n) )
+S[:len(s), :len(s)] = np.diag(s)
+
+np.linalg.norm( U.dot(S.dot(V)) - A )
+#+END_SRC
+
+So $A$ is (well, nearly -- we're working with floats after all!) the
+product $USV$ where $S$ is a matrix build from the singular values
+$s$.
+
+* SVD as a "numerical rank"
+
+One application of SVD is as a more stable way to calculate rank.
+
+Let's build a low-rank matrix.
+
+#+BEGIN_SRC ipython 
+import numpy as np
+m = 6
+n = 5
+r = 2
+X = np.random.normal(0,1,size=(m,r))
+Y = np.random.normal(0,1,size=(r,n))
+A = X.dot(Y)
+#+END_SRC
+
+We can check that this is indeed low-rank.
+
+#+BEGIN_SRC ipython 
+np.linalg.matrix_rank(A)
+#+END_SRC
+
+Now if we add some noise to $A$, we might begin to worry.
+
+#+BEGIN_SRC ipython 
+noise = np.random.normal(0,0.01,size=(m,n))
+np.linalg.matrix_rank(A + noise)
+#+END_SRC
+
+The rank of $A + \mathrm{noise}$ is indeed $\mathrm{min}(m,n)$.
+
+Look at the singular values though.
+
+#+BEGIN_SRC ipython 
+_, s, _ = np.linalg.svd(A + noise)
+s
+#+END_SRC
+
+There are some large singular values, and some small singular values.
+Let's leverage this observation to compute rank even for noisy
+matrices.
+
+#+BEGIN_SRC ipython 
+def numerical_rank(A, epsilon=0.1):
+   _, s, _ = np.linalg.svd(A + noise)
+   return np.sum( np.abs(s) > epsilon )
+#+END_SRC
+
+#+BEGIN_SRC ipython 
+numerical_rank(A)
+#+END_SRC
+
+* SVD for the pseudoinverse
+
+Let's again pick a random matrix $A$ and finds its SVD.
+
+#+BEGIN_SRC ipython 
+import numpy as np
+m = 6
+n = 5
+A = np.random.normal(0,1,size=(m,n))
+
+U, s, V = np.linalg.svd(A)
+#+END_SRC
+
+Now construct $A^{+}$, a *pseudoinverse* of $A$.
+
+#+BEGIN_SRC ipython 
+D = np.zeros( (n, m) )
+D[:len(s), :len(s)] = np.diag(1/s)
+
+Aplus = (V.T).dot( D.dot( U.T ) )
+Aplus.dot( A )
+#+END_SRC
+
+Is this ever the actual inverse of $A$?  When $A$ is not square, what
+are some nevertheless nice properties of the pseudoinverse?
+
+* SVD for dimension reduction
+
+Given a matrix $A$, we could ask for the "nearest" matrix to $A$ which
+has rank $r$.
+
+Your homework is to structure this as yet another "cost" problem,
+i.e., the cost to minimize is the sum of the squares of the difference
+of the entries of $A$ and the rank $r$ approximation.  Randomly sample to get a sense of the distribution of these cost functions.
+
+Then see how well you do with SVD; throw away all but the largest $r$
+singular values, replace the others with zero, and perform the same
+"matrix reconstruction" as above.  Of course, you won't get the
+original matrix, but what is the rank of the matrix you produced?  How
+close is it to the original matrix?
+
+* SVD to PCA
+
+There is a lot more to say about the power of SVD.
+
+One thing to dig into is the relationship between SVD and PCA.  Some of this is discussed at https://stats.stackexchange.com/questions/134282/relationship-between-svd-and-pca-how-to-use-svd-to-perform-pca
+
+* Underview
+
+Your comparative advantage in the marketplace lies in your ability to
+leverage your existing knowledge and apply it to data science.  With
+things like SVD, I hope you recognize just how strong you really are:
+you know a ton of mathematics, and you can use this to dig deeper --
+and dig quickly -- into data science.  The intuition you have from
+linear algebra will serve you well throughout your career.

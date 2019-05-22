@@ -1,0 +1,105 @@
+#+TITLE: Face recognition
+#+AUTHOR: Jim Fowler
+
+* Load some faces
+
+Download the data from http://www.cad.zju.edu.cn/home/dengcai/Data/Yale/Yale_64x64.mat perhaps by using ~wget~ or ~curl~.
+
+Let's load the data.  It's in a MATLAB format, but ~scipy~ can read
+these.
+
+#+BEGIN_SRC ipython 
+import scipy.io
+X = scipy.io.loadmat('Yale_64x64.mat')['fea']
+y = scipy.io.loadmat('Yale_64x64.mat')['gnd'].reshape(-1)
+#+END_SRC
+
+* Display a face
+
+We'll use ~cmap='gray'~ so we have a grayscale colormap.  Then we can
+take a look at one of the faces.  We'll ~transpose~ so the face is
+looking at us.
+
+#+BEGIN_SRC ipython 
+face = X[17].reshape(64,64)
+import matplotlib.pyplot as plt
+plt.imshow(face.transpose(),cmap='gray')
+plt.show()
+#+END_SRC
+
+* The mean face
+
+These faces are aligned.  We can see this by taking the "mean face."
+
+#+BEGIN_SRC ipython 
+import numpy as np
+mean_face = np.mean(X, axis=0)
+import matplotlib.pyplot as plt
+plt.imshow(mean_face.reshape(64,64).transpose(),cmap='gray')
+plt.show()
+#+END_SRC
+
+* Reduce dimension
+
+There are many ways to reduce the dimension of this data set.  One
+*very* aggressive thing to do is SVD.
+
+#+BEGIN_SRC ipython 
+import numpy as np
+U, s, V = np.linalg.svd(X - mean_face)
+
+s[3:] = 0
+S = np.zeros(X.shape)
+S[:len(s), :len(s)] = np.diag(s)
+US = np.matmul(U,S)
+#+END_SRC
+
+This is throwing away a ton of data, and yet the faces are "still
+there."  For proof, let's load one.
+
+#+BEGIN_SRC ipython 
+Xp = np.matmul(np.matmul(U,S),V)
+face = (Xp[17] + mean_face).reshape(64,64)
+plt.imshow(face.transpose(),cmap='gray')
+plt.show()
+#+END_SRC
+
+We van interactively view these faces.
+
+#+BEGIN_SRC ipython 
+%matplotlib inline
+from ipywidgets import interactive
+import matplotlib.pyplot as plt
+import numpy as np
+
+import numpy as np
+U, s, V = np.linalg.svd(X - mean_face)
+
+s[4:] = 0
+S = np.zeros(X.shape)
+S[:len(s), :len(s)] = np.diag(s)
+US = np.matmul(U,S)
+
+def f(a, b, c, d):
+    Xp = np.matmul(np.matmul(U,S),V)
+    face = (a*V[:,0] + b*V[:,1] + c*V[:,2] + d*V[:,3] + mean_face).reshape(64,64)
+    plt.imshow(face.transpose(),cmap='gray')
+    plt.show()
+
+interactive_plot = interactive(f, a=(-5,5), b=(-5,5), c=(-5,5), d=(-5,5))
+output = interactive_plot.children[-1]
+output.layout.height = '350px'
+interactive_plot
+#+END_SRC
+
+* Plotting in 3D
+
+Can we identify any clusters in this low-dimensional projection?
+
+#+BEGIN_SRC ipython 
+from mpl_toolkits import mplot3d
+fig = plt.figure()
+ax = plt.axes(projection='3d')
+ax.scatter( US[:,0], US[:,1], US[:,2], c )
+plt.show()
+#+END_SRC
